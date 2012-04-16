@@ -31,9 +31,10 @@
 		
 		<script id="node-template" type="text/template">
 			<p class="node-body">
-				<span class="node-name"><span class="name"><%= name %></span><input type="text" value="<%= name %>" class="text node-name" /></span> { <input type="text" class="text px" value="<%= pxVal %>" /> px = <input type="text" class="text ems" value="<%= emVal %>em" readonly /> }
+				<span class="node-name"><span class="name" title="Change node name"><%= name %></span><input type="text" value="<%= name %>" class="text node-name" /></span> { <input type="text" class="text px" value="<%= pxVal %>" /> px = <input type="text" class="text ems" value="<%= emVal %>em" readonly /> }
 				<button class="js-add-node">Add</button>
 				<button class="js-add-sub-node">Add Sub</button>
+				<span class="delete">&times;</span>
 			</p>
 		</script>
 		<script src="js/libs/jquery-1.7.1.min.js"></script>

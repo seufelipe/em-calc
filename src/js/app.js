@@ -9,7 +9,7 @@
 	var NodeModel = Backbone.Model.extend({
 			defaults: {
 				name: "node",
-				pxVal: 12,
+				pxVal: "",
 				emVal: 1,
 				context: 16
 			},
@@ -27,6 +27,10 @@
 				this.bind("change:emVal", function() {
 					log("'emVal' changed to: " + this.get("emVal") + "em");
 				});
+				
+				this.bind("change:name", function() {
+					log("'name' changed to: " + this.get("name"));
+				});
 			},
 		
 			calcEms: function(target, context) {
@@ -38,6 +42,10 @@
 						"emVal": result
 					});
 				}
+			},
+			
+			clear: function() {
+				this.destroy();
 			}
 		}),
 		node_model = new NodeModel;
@@ -53,12 +61,16 @@
 			tmpl: _.template($("#node-template").html()),
 		
 			events: {
+				"dblclick .name": "toggleNodeName",
+				"change input.node-name": "updateNodeName",
 				"change .px": "updatePxVal",
-				"dblclick .node-name": "updateNodeName"
+				"click .delete": "clear"
 			},
 		
 			initialize: function() {
 				this.render();
+				
+				this.model.bind("destroy", this.remove);
 			},
 		
 			render: function() {
@@ -69,44 +81,73 @@
 				return this;
 			},
 		
+			toggleNodeName: function() {
+				var $el = this.$el,
+					$name = $el.find(".name"),
+					$nodeName = $el.find("input.node-name");
+				
+				if ($name.is(":visible")) {
+					$name.hide();
+					$nodeName.show().select();
+				}
+				else {
+					$name.show();
+					$nodeName.hide();
+				}
+			},
+			
 			updateNodeName: function() {
-				$(this.el).find(".name").hide().end().find("input.node-name").show();
+				var val = this.$el.find("input.node-name").val(),
+					$name = this.$el.find(".name");
+				
+				this.model.set("name", val);
+				$name.text(val);
+				
+				this.toggleNodeName();
 			},
 		
 			updatePxVal: function() {
 				var $px_field = $(this.el).find("input.px"),
 					val = parseInt($px_field.val(), 10);
-			
+				
 				// Update px field with the parsed integer
 				// to remove any non-numeric characters.
 				$px_field.val(val);
-			
+				
 				this.model.set("pxVal", val);
-			
+				
 				this.updateEmVal();
 			},
 		
 			updateEmVal: function() {
 				$(this.el).find("input.ems").val(this.model.get("emVal") + "em");
+			},
+			
+			clear: function() {
+				this.model.clear();
 			}
 		}),
 		node_view = new NodeView;
 	
 	// Node collection.
 	var NodeCollection = Backbone.Collection.extend({
-			model: node_model
+			model: node_model,
+			
+			initialize: function() {
+				
+			}
 		}),
-		node_collection = new NodeCollection;
+		Nodes = new NodeCollection;
 	
 	// App.
 	var AppView = Backbone.View.extend({
 			el: $("#em-calc"),
-		
+			
 			initialize: function() {
-				$(this.el).on("click", "input.ems", function(e) {
+				this.$el.on("click", "input.ems", function(e) {
 					this.select();
 				});
 			}
 		}),
 		app_view = new AppView;
-})(jQuery, document, window);
+})(window.jQuery, document, window);

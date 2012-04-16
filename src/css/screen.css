@@ -32,17 +32,6 @@ body {
 	line-height: 1.4;
 }
 
-::-moz-selection {
-	background: #fe57a1;
-	color: #fff;
-	text-shadow: none;
-}
-::selection {
-	background: #fe57a1;
-	color: #fff;
-	text-shadow: none;
-}
-
 a {color: #00e;}
 a:visited {color: #551a8b;}
 a:hover {color: #06e;}
@@ -213,7 +202,17 @@ body {font-size: 0.75em;}
 	width: 70px;
 }
 
+.name {cursor: default;}
+
 input.node-name {display: none;}
+
+.delete {
+	font-weight: bold;
+	cursor: pointer;
+	display: inline-block;
+	margin-left: 2px;
+}
+.delete:hover {color: #999;}
 
 
 /*
