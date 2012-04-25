@@ -212,7 +212,7 @@ input.node-name {display: none;}
 	display: inline-block;
 	margin-left: 2px;
 }
-.delete:hover {color: #999;}
+.delete:hover {opacity: 0.4;}
 
 
 /*

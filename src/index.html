@@ -7,13 +7,12 @@
 		
 		<link rel="stylesheet" href="css/screen.css" />
 		<!--
-			Todos
+			Todos:
 			* Node sets and sub nodes.
 			* Settings panel for base font size, etc.
-			* Edit node name.
 			* Delete node.
 			* Preview panel for font sizes.
-			* Export HTML.
+			* Save
 		-->
 	</head>
 	
@@ -23,15 +22,15 @@
 			<p>Base font size: <strong>16px</strong></p>
 			
 			<div id="em-calc">
-				<ul id="node-list">
+				<!-- <ul id="node-list">
 					
-				</ul>
+				</ul> -->
 			</div>
 		</div>
 		
 		<script id="node-template" type="text/template">
 			<p class="node-body">
-				<span class="node-name"><span class="name" title="Change node name"><%= name %></span><input type="text" value="<%= name %>" class="text node-name" /></span> { <input type="text" class="text px" value="<%= pxVal %>" /> px = <input type="text" class="text ems" value="<%= emVal %>em" readonly /> }
+				<span class="node-name"><span class="name" title="Change node name"><%= name %></span><input type="text" value="<%= name %>" class="text node-name" /></span> { <input type="text" class="text px" value="<%= px %>" /> px = <input type="text" class="text ems" value="<%= em %>em" readonly /> }
 				<button class="js-add-node">Add</button>
 				<button class="js-add-sub-node">Add Sub</button>
 				<span class="delete">&times;</span>

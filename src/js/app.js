@@ -6,53 +6,64 @@
 	};
 	
 	// Node model.
-	var NodeModel = Backbone.Model.extend({
+	var Node = Backbone.Model.extend({
 			defaults: {
 				name: "node",
-				pxVal: "",
-				emVal: 1,
+				px: "",
+				em: 1,
 				context: 16
 			},
 		
 			initialize: function() {
-				this.bind("change:pxVal", function() {
-					var px = this.get("pxVal");
+				this.bind("change:px", function() {
+					var px = this.get("px");
 				
-					log("'pxVal' changed to: " + px);
+					log("'px' changed to: " + px);
 				
 					// Re-calc the ems once the pixels have been changed.
 					this.calcEms(px, 16); // Hardcoded the context at "16" for now.
 				});
 			
-				this.bind("change:emVal", function() {
-					log("'emVal' changed to: " + this.get("emVal") + "em");
+				this.bind("change:em", function() {
+					log("'em' changed to: " + this.get("em") + "em");
 				});
 				
 				this.bind("change:name", function() {
 					log("'name' changed to: " + this.get("name"));
 				});
 			},
-		
+			
+			validate: function(attributes) {
+				if (/\D/g.test(attributes.px)) {
+					return "Please enter a number.";
+				}
+			},
+			
 			calcEms: function(target, context) {
 				if ($.isNumeric(target)) { // Don't bother if target's not a number.
 					var result = target / context;
 				
 					this.set({
-						"pxVal": target,
-						"emVal": result
+						"px": target,
+						"em": result
 					});
 				}
-			},
-			
-			clear: function() {
-				this.destroy();
 			}
 		}),
-		node_model = new NodeModel;
+		node = new Node;
+	
+	// Nodes collection.
+	var Nodes = Backbone.Collection.extend({
+		model: node,
+		
+		initialize: function() {
+			this.add(node);
+		}
+	});
 	
 	// Node view.
 	var NodeView = Backbone.View.extend({
-			model: node_model,
+			model: node,
 		
 			tagName: "li",
 		
@@ -62,22 +73,19 @@
 		
 			events: {
 				"dblclick .name": "toggleNodeName",
-				"change input.node-name": "updateNodeName",
-				"change .px": "updatePxVal",
-				"click .delete": "clear"
+				"blur input.node-name": "updateNodeName",
+				"change .px": "updatePx",
+				"click .js-add-node": "addNew",
+				"click .js-add-sub-node": "addSub"
 			},
 		
 			initialize: function() {
 				this.render();
-				
-				this.model.bind("destroy", this.remove);
 			},
 		
 			render: function() {
 				$(this.el).html(this.tmpl(this.model.attributes));
-			
-				$("#node-list").append($(this.el));
-			
+				
 				return this;
 			},
 		
@@ -106,38 +114,59 @@
 				this.toggleNodeName();
 			},
 		
-			updatePxVal: function() {
-				var $px_field = $(this.el).find("input.px"),
-					val = parseInt($px_field.val(), 10);
+			updatePx: function() {
+				var $pxField = $(this.el).find("input.px"),
+					val = parseInt($pxField.val(), 10);
 				
 				// Update px field with the parsed integer
 				// to remove any non-numeric characters.
-				$px_field.val(val);
+				$pxField.val(val);
 				
-				this.model.set("pxVal", val);
+				this.model.set("px", val);
 				
-				this.updateEmVal();
+				this.updateEm();
 			},
 		
-			updateEmVal: function() {
-				$(this.el).find("input.ems").val(this.model.get("emVal") + "em");
+			updateEm: function() {
+				$(this.el).find("input.ems").val(this.model.get("em") + "em");
 			},
 			
-			clear: function() {
-				this.model.clear();
-			}
-		}),
-		node_view = new NodeView;
-	
-	// Node collection.
-	var NodeCollection = Backbone.Collection.extend({
-			model: node_model,
+			addNew: function() {
+				log("Add one");
+			},
 			
-			initialize: function() {
+			addSub: function() {
+				log("Add sub");
+			},
+			
+			delete: function() {
 				
 			}
-		}),
-		Nodes = new NodeCollection;
+		})
+		//, node_view = new NodeView;
+	
+	// Node collection.
+	var NodesView = Backbone.View.extend({
+		tagName: "ul",
+		
+		className: "node-list",
+		
+		context: "#em-calc",
+		
+		initialize: function() {
+			this.collection = new Nodes();
+			this.collection.bind("add", this.render);
+			
+			this.render();
+		},
+		
+		render: function() {
+			this.$el.append(new NodeView({model: node}).render().el);
+			this.$el.appendTo(this.context);
+			
+			return this;
+		}
+	});
 	
 	// App.
 	var AppView = Backbone.View.extend({
@@ -148,6 +177,8 @@
 					this.select();
 				});
 			}
-		}),
-		app_view = new AppView;
+		});
+	
+	var nodesView = new NodesView(),
+		appView = new AppView;
 })(window.jQuery, document, window);
