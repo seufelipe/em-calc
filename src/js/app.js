@@ -7,134 +7,136 @@
 	
 	// Node model.
 	var Node = Backbone.Model.extend({
-			defaults: {
-				name: "node",
-				px: "",
-				em: 1,
-				context: 16
-			},
-		
-			initialize: function() {
-				this.bind("change:px", function() {
-					var px = this.get("px");
+		defaults: {
+			name: "node",
+			px: "",
+			em: 1,
+			context: 16
+		},
+			
+		initialize: function() {
+			this.bind("change:px", function() {
+				var px = this.get("px");
 				
-					// Re-calc the ems once the pixels have been changed.
-					this.calcEms(px, 16); // Hardcoded the context at "16" for now.
+				// Re-calc the ems once the pixels have been changed.
+				this.calcEms(px, 16); // Hardcoded the context at "16" for now.
+			});
+		},
+			
+		// validate: function(attributes) {
+		// 	if (/\D/g.test(attributes.px)) {
+		// 		return "Please enter a number.";
+		// 	}
+		// },
+			
+		calcEms: function(target, context) {
+			if ($.isNumeric(target)) { // Don't bother if target's not a number.
+				var result = target / context;
+				
+				this.set({
+					"px": target,
+					"em": result
 				});
-			},
-			
-			validate: function(attributes) {
-				if (/\D/g.test(attributes.px)) {
-					return "Please enter a number.";
-				}
-			},
-			
-			calcEms: function(target, context) {
-				if ($.isNumeric(target)) { // Don't bother if target's not a number.
-					var result = target / context;
-				
-					this.set({
-						"px": target,
-						"em": result
-					});
-				}
 			}
-		}),
-		node = new Node;
+		}
+	});
 	
 	// Nodes collection.
 	var Nodes = Backbone.Collection.extend({
-		model: node,
+		model: new Node(),
 		
 		initialize: function() {
-			this.add(node);
+			this.add(new Node());
 		}
 	});
 	
 	// Node view.
 	var NodeView = Backbone.View.extend({
-			model: node,
+		tagName: "li",
 		
-			tagName: "li",
+		className: "node",
 		
-			className: "node",
+		tmpl: _.template($("#node-template").html()),
 		
-			tmpl: _.template($("#node-template").html()),
+		events: {
+			"dblclick .name": "toggleNodeName",
+			"blur input.node-name": "updateNodeName",
+			"change .px": "updatePx",
+			"click .js-add-node": "addNew",
+			"click .js-add-sub-node": "addSub",
+			"click .delete": "delete"
+		},
 		
-			events: {
-				"dblclick .name": "toggleNodeName",
-				"blur input.node-name": "updateNodeName",
-				"change .px": "updatePx",
-				"click .js-add-node": "addNew",
-				"click .js-add-sub-node": "addSub",
-				"click .delete": "delete"
-			},
+		initialize: function() {
+			this.render();
+		},
 		
-			initialize: function() {
-				this.render();
-			},
-		
-			render: function() {
-				$(this.el).html(this.tmpl(this.model.attributes));
-				
-				return this;
-			},
-		
-			toggleNodeName: function() {
-				var $el = this.$el,
-					$name = $el.find(".name"),
-					$nodeName = $el.find("input.node-name");
-				
-				if ($name.is(":visible")) {
-					$name.hide();
-					$nodeName.show().select();
-				}
-				else {
-					$name.show();
-					$nodeName.hide();
-				}
-			},
+		render: function() {
+			$(this.el).html(this.tmpl(this.model.attributes));
 			
-			updateNodeName: function() {
-				var val = this.$el.find("input.node-name").val(),
-					$name = this.$el.find(".name");
-				
-				this.model.set("name", val);
-				$name.text(val);
-				
-				this.toggleNodeName();
-			},
+			return this;
+		},
 		
-			updatePx: function() {
-				var $pxField = $(this.el).find("input.px"),
-					val = parseInt($pxField.val(), 10);
+		toggleNodeName: function() {
+			var $el = this.$el,
+				$name = $el.find(".name"),
+				$nodeName = $el.find("input.node-name");
 				
-				// Update px field with the parsed integer
-				// to remove any non-numeric characters.
-				$pxField.val(val);
-				
-				this.model.set("px", val);
-				
-				this.updateEm();
-			},
-		
-			updateEm: function() {
-				$(this.el).find("input.ems").val(this.model.get("em") + "em");
-			},
-			
-			addNew: function() {
-				log("Add one");
-			},
-			
-			addSub: function() {
-				log("Add sub");
-			},
-			
-			delete: function() {
-				log("Delete");
+			if ($name.is(":visible")) {
+				$name.hide();
+				$nodeName.show().select();
 			}
-		})
-		//, node_view = new NodeView;
+			else {
+				$name.show();
+				$nodeName.hide();
+			}
+		},
+			
+		updateNodeName: function() {
+			var val = this.$el.find("input.node-name").val(),
+				$name = this.$el.find(".name");
+				
+			this.model.set("name", val);
+			$name.text(val);
+				
+			this.toggleNodeName();
+		},
+		
+		updatePx: function() {
+			var $pxField = $(this.el).find("input.px"),
+				val = parseInt($pxField.val(), 10);
+				
+			// Update px field with the parsed integer
+			// to remove any non-numeric characters.
+			$pxField.val(val);
+				
+			this.model.set("px", val);
+				
+			this.updateEm();
+		},
+		
+		updateEm: function() {
+			$(this.el).find("input.ems").val(this.model.get("em") + "em");
+		},
+			
+		addNew: function() {
+			var idx = nodesView.collection.indexOf(this.model);
+			
+			nodesView.collection.add(new Node(), {
+				at: idx + 1
+			});
+			
+			log(nodesView.collection.length);
+		},
+			
+		addSub: function() {
+			log("Add sub");
+		},
+			
+		delete: function() {
+			log("Delete");
+		}
+	});
 	
 	// Node collection.
 	var NodesView = Backbone.View.extend({
@@ -145,6 +147,7 @@
 		context: "#em-calc",
 		
 		initialize: function() {
+			_.bindAll(this);
 			this.collection = new Nodes();
 			this.collection.bind("add", this.render);
 			
@@ -152,7 +155,14 @@
 		},
 		
 		render: function() {
-			this.$el.append(new NodeView({model: node}).render().el);
+			var that = this;
+			
+			this.$el.html("");
+			this.collection.each(function(node) {
+				that.$el.append(new NodeView({
+					model: node
+				}).render().el);
+			});
 			this.$el.appendTo(this.context);
 			
 			return this;
