@@ -18,18 +18,8 @@
 				this.bind("change:px", function() {
 					var px = this.get("px");
 				
-					log("'px' changed to: " + px);
-				
 					// Re-calc the ems once the pixels have been changed.
 					this.calcEms(px, 16); // Hardcoded the context at "16" for now.
-				});
-			
-				this.bind("change:em", function() {
-					log("'em' changed to: " + this.get("em") + "em");
-				});
-				
-				this.bind("change:name", function() {
-					log("'name' changed to: " + this.get("name"));
 				});
 			},
 			
@@ -76,7 +66,8 @@
 				"blur input.node-name": "updateNodeName",
 				"change .px": "updatePx",
 				"click .js-add-node": "addNew",
-				"click .js-add-sub-node": "addSub"
+				"click .js-add-sub-node": "addSub",
+				"click .delete": "delete"
 			},
 		
 			initialize: function() {
@@ -140,7 +131,7 @@
 			},
 			
 			delete: function() {
-				
+				log("Delete");
 			}
 		})
 		//, node_view = new NodeView;
