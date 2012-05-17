@@ -13,14 +13,39 @@
 		<script src="vendor/jasmine.js"></script>
 		<script src="vendor/jasmine-html.js"></script>
 		
-		<script src="../../src/js/libs/jquery-1.7.1.js"></script>
+		<script src="../../src/js/libs/jquery-1.7.1.min.js"></script>
 		<script src="../../src/js/libs/underscore-min.js"></script>
 		<script src="../../src/js/libs/backbone-min.js"></script>
 		
 		<script src="../../src/js/app.js"></script>
+		<script src="spec/node-spec.js"></script>
 		
 		<script>
-			
+			(function(win) {
+				var jasmineEnv = jasmine.getEnv(),
+					trivialReporter = new jasmine.TrivialReporter(),
+					currentWindowOnload = win.onload;
+				
+				jasmineEnv.updateInterval = 1000;
+				
+				jasmineEnv.addReporter(trivialReporter);
+				
+				jasmineEnv.specFilter = function(spec) {
+					return trivialReporter.specFilter(spec);
+				};
+				
+				var execJasmine = function() {
+					jasmineEnv.execute();
+				};
+				
+				win.onload = function() {
+					if (currentWindowOnload) {
+						currentWindowOnload();
+					}
+					
+					execJasmine();
+				};
+			})(window);
 		</script>
 	</body>
 </html>
