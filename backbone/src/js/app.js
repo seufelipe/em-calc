@@ -22,11 +22,9 @@ var Node = Backbone.Model.extend({
 		});
 	},
 	
-	// validate: function(attributes) {
-	// 	if (/\D/g.test(attributes.px)) {
-	// 		return "Please enter a number.";
-	// 	}
-	// },
+	validate: function(attributes) {
+		
+	},
 	
 	calcEms: function(target, context) {
 		if ($.isNumeric(target)) { // Don't bother if target's not a number.
@@ -116,22 +114,27 @@ var NodeView = Backbone.View.extend({
 		this.$el.find("input.ems").val(this.model.get("em") + "em");
 	},
 	
-	addNew: function() {
+	// Add new sibling node.
+	
+		// Get the current node's index.
 		var idx = nodesView.collection.indexOf(this.model);
 		
+		// Add a new one after it.
 		nodesView.collection.add(new Node(), {
 			at: idx + 1
 		});
 	},
 	
+	// A new child node list.
 	addSub: function() {
-		this.subNodeList = new NodesView({
-			context: this.$el
-		});
-		
-		log(this.subNodeList.context);
+		// this.subNodeList = new NodesView({
+		// 	context: this.$el
+		// });
+		// 
+		// log(this.subNodeList.context);
 	},
 	
+	// Delete a node.
 	delete: function() {
 		var collection = nodesView.collection;
 		
@@ -141,7 +144,7 @@ var NodeView = Backbone.View.extend({
 	}
 });
 	
-// Node collection.
+// Node collection view.
 var NodesView = Backbone.View.extend({
 	tagName: "ul",
 	
@@ -150,9 +153,13 @@ var NodesView = Backbone.View.extend({
 	context: "#em-calc",
 	
 	initialize: function() {
+		// Bind methods to this.
 		_.bindAll(this);
 		
+		// Create nodes collection.
 		this.collection = new Nodes();
+		
+		// Re-render on add or remove.
 		this.collection.bind("add", this.render);
 		this.collection.bind("remove", this.render);
 		
