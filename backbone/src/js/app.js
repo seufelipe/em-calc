@@ -10,15 +10,15 @@
 	// Node model.
 	var Node = Backbone.Model.extend({
 		defaults: {
-			name: "node",
-			px: "",
+			name: 'node',
+			px: '',
 			em: 1,
 			context: 16
 		},
 
 		initialize: function() {
-			this.bind("change:px", function() {
-				var px = this.get("px");
+			this.bind('change:px', function() {
+				var px = this.get('px');
 
 				// Re-calc the ems once the pixels have been changed.
 				this.calcEms(px, 16); // Hardcoded the context at "16" for now.
@@ -30,8 +30,8 @@
 				var result = target / context;
 
 				this.set({
-					"px": target,
-					"em": result
+					'px': target,
+					'em': result
 				});
 			}
 		}
@@ -46,19 +46,19 @@
 
 	// Node view.
 	var NodeView = Backbone.View.extend({
-		tagName: "li",
+		tagName: 'li',
 
-		className: "node",
+		className: 'node',
 
-		tmpl: _.template($("#node-template").html()),
+		tmpl: _.template($('#node-template').html()),
 
 		events: {
-			"dblclick .name": "toggleNodeName",
-			"blur input.node-name": "updateNodeName",
-			"change .px": "updatePx",
-			"click .add-sibling": "addSibling",
-			"click .add-child": "addChild",
-			"click .delete": "delete"
+			'dblclick .name': 'toggleNodeName',
+			'blur input.node-name': 'updateNodeName',
+			'change .px': 'updatePx',
+			'click .add-sibling': 'addSibling',
+			'click .add-child': 'addChild',
+			'click .delete': 'delete'
 		},
 
 		initialize: function() {
@@ -73,10 +73,10 @@
 
 		toggleNodeName: function() {
 			var $el = this.$el,
-				$name = $el.find(".name"),
-				$node_name = $el.find("input.node-name");
+				$name = $el.find('.name'),
+				$node_name = $el.find('input.node-name');
 		
-			if ($name.is(":visible")) {
+			if ($name.is(':visible')) {
 				$name.hide();
 				$node_name.show().select();
 			} else {
@@ -86,30 +86,30 @@
 		},
 
 		updateNodeName: function() {
-			var val = this.$el.find("input.node-name").val(),
-				$name = this.$el.find(".name");
+			var val = this.$el.find('input.node-name').val(),
+				$name = this.$el.find('.name');
 		
-			this.model.set("name", val);
+			this.model.set('name', val);
 			$name.text(val);
 		
 			this.toggleNodeName();
 		},
 	
 		updatePx: function() {
-			var $px_field = this.$el.find("input.px"),
+			var $px_field = this.$el.find('input.px'),
 				val = parseInt($px_field.val(), 10);
 
 			// Update px field with the parsed integer
 			// to remove any non-numeric characters.
 			$px_field.val(val);
 
-			this.model.set("px", val);
+			this.model.set('px', val);
 
 			this.updateEm();
 		},
 
 		updateEm: function() {
-			this.$el.find("input.ems").val(this.model.get("em") + "em");
+			this.$el.find('input.ems').val(this.model.get('em') + 'em');
 		},
 
 		// Add new sibling node.
@@ -146,11 +146,11 @@
 
 	// Node collection view.
 	var NodesView = Backbone.View.extend({
-		tagName: "ul",
+		tagName: 'ul',
 
-		className: "node-list",
+		className: 'node-list',
 
-		context: ".list",
+		context: '.list',
 
 		initialize: function() {
 			// Bind methods to this.
@@ -160,8 +160,8 @@
 			this.collection = new Nodes();
 
 			// Re-render on add or remove.
-			this.collection.bind("add", this.render);
-			this.collection.bind("remove", this.render);
+			this.collection.bind('add', this.render);
+			this.collection.bind('remove', this.render);
 
 			this.render();
 		},
@@ -169,7 +169,7 @@
 		render: function() {
 			var that = this;
 
-			this.$el.html("");
+			this.$el.html('');
 
 			this.collection.each(function(node) {
 				that.$el.append(new NodeView({
@@ -194,23 +194,23 @@
 	var AppView = Backbone.View.extend({
 			model: new AppModel(),
 
-			el: $(".em-calc"),
+			el: $('.em-calc'),
 
-			settingsTmpl: _.template($("#settings-template").html()),
+			tmpl: _.template($('#settings-template').html()),
 
 			initialize: function() {
 				this.$settings = this.$('.settings-list');
 
-				this.$el.on("click", "input.ems", function(e) {
+				this.$el.on('click', 'input.ems', function(e) {
 					this.select();
 				});
 
 				this.render();
 			},
-			
+
 			render: function() {
-				this.$settings.html(this.settingsTmpl(this.model.attributes));
-				
+				this.$settings.html(this.tmpl(this.model.attributes));
+
 				return this;
 			}
 		});
