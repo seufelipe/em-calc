@@ -184,6 +184,7 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+
 td {vertical-align: top;}
 
 
@@ -211,6 +212,7 @@ input.node-name {display: none;}
 	display: inline-block;
 	margin-left: 2px;
 }
+
 .delete:hover {opacity: 0.4;}
 
 
@@ -239,5 +241,5 @@ input.node-name {display: none;}
 	content: "";
 	display: table;
 }
+
 .cf:after {clear: both;}
-.cf {*zoom: 1;}
