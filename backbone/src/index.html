@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Em Calculator</title>
-		
+
 		<link rel="stylesheet" href="css/screen.css" />
 		<!--
 			Todos:
@@ -15,26 +15,39 @@
 			* Save
 		-->
 	</head>
-	
+
 	<body>
-		<div class="wrap">
+		<div class="wrap em-calc">
 			<h1>Em Calculator</h1>
-			<p>Base font size: <strong>16px</strong></p>
-			
-			<div id="em-calc">
-				
+
+			<div class="settings">
+				<h2>Settings</h2>
+
+				<div class="settings-list"></div>
 			</div>
+
+			<hr />
+
+			<div class="list"></div>
 		</div>
-		
+
+		<script id="settings-template" type="text/template">
+			<ul class="settings-list">
+				<li class="base-px">Base font size: <input type="text" class="text base-px" value="<%= basePx %>" /></li>
+				<li class="decimal-places">Decimal places: <input type="text" class="text decimal-places" value="<%= decimalPlaces %>" /></li>
+			</ul>
+		</script>
+
 		<script id="node-template" type="text/template">
 			<p class="node-body">
 				<span class="node-name"><span class="name" title="Change node name"><%= name %></span><input type="text" value="<%= name %>" class="text node-name" /></span> { <input type="text" class="text px" value="<%= px %>" /> px = <input type="text" class="text ems" value="<%= em %>em" readonly /> }
-				<button class="js-add-node">Add</button>
-				<button class="js-add-sub-node">Add Sub</button>
+				<button class="add-sibling">Add</button>
+				<button class="add-child">Add Sub</button>
 				<span class="delete">&times;</span>
 			</p>
 		</script>
-		<script src="js/libs/jquery-1.7.1.min.js"></script>
+
+		<script src="js/libs/jquery-1.8.0.min.js"></script>
 		<script src="js/libs/underscore-min.js"></script>
 		<script src="js/libs/backbone-min.js"></script>
 		<script src="js/app.js"></script>

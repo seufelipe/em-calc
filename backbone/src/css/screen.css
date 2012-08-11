@@ -196,11 +196,10 @@ body {font-size: 0.75em;}
 
 .wrap {
 	margin: 10px;
+	width: 700px;
 }
 
-.node .text {
-	width: 70px;
-}
+.node .text {width: 70px;}
 
 .name {cursor: default;}
 
