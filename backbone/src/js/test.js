@@ -1,34 +1,265 @@
-var log = function(message) {
-	if (window.console && window.console.log) {
-		window.console.log(message);
-	}
-};
+var app = app || {};
 
-var Mod = Backbone.Model.extend({
-	defaults: {
-		text: "New model"
-	}
-});
+(function() {
+	'use strict';
 
-var ModView = Backbone.Model.extend({
-	tagName: "li",
-	render: function() {
-		$(this.el).html(this.model.get("text"));
+	// app.Settings = Backbone.Model.extend({
+	// 	defaults: {
+	// 		px: 16
+	// 	},
+	// 
+	// 	initialize: function() {
+	// 		this.bind('change:px', function() {
+	// 			app.root_node_set.set('px', this.get('px'));
+	// 		});
+	// 	}
+	// });
 
-		return this;
-	}
-});
+	app.Node = Backbone.RelationalModel.extend({
+		defaults: {
+			name: 'node',
+			px: null,
+			em: null
+		},
 
-var Lists = Backbone.Collection.extend({
-	initialize: function() {
-		log("New list initialized");
-	}
-});
+		initialize: function() {
+			this.bind('change:px', function() {
+				window.console.log('Changed! ' + this.get('px'));
 
-var List = Backbone.Collection.extend({
-	initialize: function() {
-		this.add(new Mod());
-	}
-});
+				// Need to run .calcEms() here!
+			});
+		}
+	});
 
-var all_lists = new Lists();
+	app.Set = Backbone.RelationalModel.extend({
+		defaults: {
+			px: 16
+		},
+
+		relations: [
+			{
+				type: Backbone.HasMany,
+				key: 'children',
+				relatedModel: 'app.Node',
+				collectionType: 'app.NodesCollection',
+				reverseRelation: {
+					type: Backbone.HasOne,
+					key: 'parent'
+				}
+			}
+		],
+
+		initialize: function() {
+			var root = this;
+
+			this.bind('add:children', function(model, coll) {
+				// this.logChildSettings(model);
+
+				model.set('px', this.get('px'));
+			});
+
+			this.bind('change:px', function() {
+				// window.console.log('====================');
+				window.console.log('Changed! ' + this.get('px'));
+
+				_.each(this.get('children').models, function(val) {
+					// root.logChildSettings(val);
+				});
+			});
+
+			this.get('children').add(new app.Node({
+				name: 'html'
+			}));
+		},
+
+		logChildSettings: function(model) {
+			window.console.log(model.get('name'));
+			window.console.log(model.get('px'));
+			window.console.log(model.get('parent').get('px'));
+		}
+	});
+
+	app.NodesCollection = Backbone.Collection.extend({
+		model: app.Node
+	});
+
+	// app.SettingsView = Backbone.View.extend({
+	// 	el: '.settings',
+	// 
+	// 	initialize: function() {
+	// 		this.$basePx = this.$el.find('#base-px');
+	// 	},
+	// 
+	// 	events: {
+	// 		'submit form': 'setBasePx'
+	// 	},
+	// 
+	// 	setBasePx: function(event) {
+	// 		var px = parseInt(this.$basePx.val(), 10);
+	// 
+	// 		event.preventDefault();
+	// 
+	// 		this.model.set('px', px);
+	// 	}
+	// });
+
+	app.SetView = Backbone.View.extend({
+		tagName: 'ul',
+
+		className: 'nodes-list',
+
+		initialize: function() {
+			// _.bindAll(this);
+
+			this.model.get('children').bind('add', this.render);
+
+			this.render();
+		},
+
+		render: function() {
+			var root = this;
+
+			this.model.get('children').each(function(model) {
+				root.$el.append(new app.NodeView({
+					model: model
+				}).render().el);
+			});
+
+			this.$el.appendTo(this.model.get('$context'));
+
+			return this;
+		}
+	});
+
+	app.NodeView = Backbone.View.extend({
+		tagName: 'li',
+
+		className: 'node',
+
+		tmpl: _.template($('#node-template').html()),
+
+		events: {
+			'click .add-sibling': 'addSibling',
+			'click .add-child': 'addChild',
+			'change .px': 'setPx'
+		},
+
+		initialize: function() {
+			this.render();
+		},
+
+		render: function() {
+			this.$el.html(this.tmpl(this.model.attributes));
+
+			return this;
+		},
+
+		addSibling: function() {
+			var idx = this.model.get('parent').get('children').indexOf(this.model);
+
+			window.console.log(idx);
+			window.console.log(this.model.get('parent').get('children').length);
+
+			// this.model.get('parent').get('children').add(new app.Node(), {
+			// 	at: idx + 1
+			// });
+		},
+
+		addChild: function(event) {
+			event.stopPropagation();
+
+			this.nodes_view = new app.SetView({
+				model: new app.Set({
+					$context: this.el
+				})
+			});
+
+			// window.console.log('Add child.');
+			// window.console.log(this.nodes_view.model.get('children').length);
+		},
+
+		setPx: function() {
+			var px = this.$el.find('.px').val();
+
+			this.model.set('px', px);
+		}
+	});
+
+	app.App = Backbone.View.extend({
+		el: '.em-calc',
+
+		initialize: function() {
+			// app.settings = new app.Settings();
+
+			// new app.SettingsView({
+			// 	model: app.settings
+			// });
+
+			new app.SetView({
+				model: new app.Set({
+					$context: this.el
+				})
+			});
+		}
+	});
+
+	new app.App();
+
+	// settings = new app.Settings();
+	// 
+	// root_node_set = new app.Set();
+	// 
+	// root_node_set.get('children').add([
+	// 	new app.Node({
+	// 		name: 'Matt'
+	// 	}),
+	// 	new app.Node({
+	// 		name: 'Pete'
+	// 	})
+	// ]);
+	// 
+	// new app.SettingsView({
+	// 	model: settings
+	// });
+
+
+	// ========================================================
+	// ========================================================
+
+	// setTimeout(function() {
+	// 	root_node_set.set('px', 200);
+	// }, 2000);
+
+
+	// root_node_collection = new NodesCollection();
+	// 
+	// root_node_collection.add(new Node({
+	// 	name: 'Matt'
+	// }));
+
+	// window.console.log(root_node_set);
+	// window.console.log(root_node_collection);
+
+
+	// Related model
+	// window.console.log(node_set1.get('children'));
+	// 
+	// window.console.log("NODES:");
+	// 
+	// _.each(node_set1.get('children').models, function(val, idx) {
+	// 	window.console.log(val.get('name'));
+	// });
+
+	// window.console.log('-----------------------');
+
+	// Collection
+	// _.each(NodesCollection, function(val, idx) {
+	// 	window.console.log(val.get('name'));
+	// });
+
+	// window.console.log('-----------------------');
+	// 
+	// window.console.log(node1.get('name'));
+	// window.console.log(node1.get('parent').get('px'));
+	// window.console.log(node_set1.get('children').at(1).get('name'));
+}());

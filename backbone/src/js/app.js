@@ -184,11 +184,21 @@
 	});
 
 	// App.
-	var AppModel = Backbone.Model.extend({
+	var AppModel = Backbone.RelationalModel.extend({
 		defaults: {
 			basePx: 16,
 			decimalPlaces: 2
-		}
+		},
+		
+		relations: [{
+			type: Backbone.HasMany,
+			key: '',
+			relatedModel: 'nodes',
+			reverseRelation: {
+				key: 'thread',
+				includeInJSON: '_id',
+			},
+		}]
 	});
 	
 	var AppView = Backbone.View.extend({
