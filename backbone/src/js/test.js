@@ -27,7 +27,21 @@ var app = app || {};
 				window.console.log('Changed! ' + this.get('px'));
 
 				// Need to run .calcEms() here!
+				this.calcEms();
 			});
+		},
+
+		calcEms: function() {
+			var res,
+				px = this.get('px'),
+				context = this.get('parent').get('px');
+
+			res = px / context;
+
+			this.set('em', res);
+
+			window.console.log('Ems: ' + res);
+			return res;
 		}
 	});
 
@@ -52,18 +66,18 @@ var app = app || {};
 		initialize: function() {
 			var root = this;
 
-			this.bind('add:children', function(model, coll) {
-				// this.logChildSettings(model);
-
-				model.set('px', this.get('px'));
-			});
+			// this.bind('add:children', function(model, coll) {
+			// 	// this.logChildSettings(model);
+			// 
+			// 	model.set('px', this.get('px'));
+			// });
 
 			this.bind('change:px', function() {
 				// window.console.log('====================');
 
-				_.each(this.get('children').models, function(val) {
-					// root.logChildSettings(val);
-				});
+				// _.each(this.get('children').models, function(val) {
+				// 	this.logChildSettings(val);
+				// });
 			});
 
 			this.get('children').add(new app.Node({
@@ -158,8 +172,8 @@ var app = app || {};
 
 			var idx = this.model.get('parent').get('children').indexOf(this.model);
 
-			window.console.log(idx);
-			window.console.log(this.model.get('parent').get('children').length);
+			// window.console.log(idx);
+			// window.console.log(this.model.get('parent').get('children').length);
 
 			// this.model.get('parent').get('children').add(new app.Node(), {
 			// 	at: idx + 1
@@ -183,6 +197,13 @@ var app = app || {};
 			var px = this.$el.find('.px').val();
 
 			this.model.set('px', px);
+			this.updateEms();
+		},
+
+		updateEms: function() {
+			var ems = this.model.get('em');
+
+			this.$el.find('.ems').val(ems + 'em');
 		}
 	});
 
