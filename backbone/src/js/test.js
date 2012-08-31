@@ -60,7 +60,6 @@ var app = app || {};
 
 			this.bind('change:px', function() {
 				// window.console.log('====================');
-				window.console.log('Changed! ' + this.get('px'));
 
 				_.each(this.get('children').models, function(val) {
 					// root.logChildSettings(val);
@@ -154,7 +153,9 @@ var app = app || {};
 			return this;
 		},
 
-		addSibling: function() {
+		addSibling: function(event) {
+			event.stopPropagation();
+
 			var idx = this.model.get('parent').get('children').indexOf(this.model);
 
 			window.console.log(idx);
