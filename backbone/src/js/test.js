@@ -12,7 +12,7 @@ var app = app || {};
 	app.Node = Backbone.RelationalModel.extend({
 		defaults: {
 			name: 'html',
-			target: null // px value
+			px: null
 		},
 
 		relations: [
