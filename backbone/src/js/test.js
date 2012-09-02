@@ -3,18 +3,103 @@ var app = app || {};
 (function() {
 	'use strict';
 
-	// app.Settings = Backbone.Model.extend({
-	// 	defaults: {
-	// 		px: 16
-	// 	},
-	// 
-	// 	initialize: function() {
-	// 		this.bind('change:px', function() {
-	// 			app.root_node_set.set('px', this.get('px'));
-	// 		});
-	// 	}
-	// });
+	var log = function(message) {
+		if (window.console && window.console.log) {
+			window.console.log(message);
+		}
+	};
 
+	app.Node = Backbone.RelationalModel.extend({
+		defaults: {
+			name: 'html',
+			target: null // px value
+		},
+
+		relations: [
+			{
+				type: Backbone.HasMany,
+				key: 'children',
+				relatedModel: 'app.Node', // Its related model is itself...
+				collectionType: 'app.NodesCollection',
+				reverseRelation: {
+					type: Backbone.HasOne,
+					key: 'parent'
+				}
+			}
+		],
+
+		initialize: function() {
+			// Root nodes will have no parent so we can
+			// bind events to listen for changes on the
+			// "settings" model in here...
+
+			this.bind('change:px', function() {
+				// We have children and something's changed
+				// so update all child models
+				if (this.get('children') && this.get('children').length) {
+					log('Pixels have changed!');
+
+					_.each(this.get('children').models, function(child) {
+						child.updateEm();
+						// log(model.get('name'));
+						// log(model.get('px'));
+						// log('Parent - ' + model.get('parent').get('name'));
+						// log('Ems - ' + (model.get('px') / model.get('parent').get('px')));
+						// log('==');
+					});
+				}
+			});
+
+			this.bind('add:children', function(child) {
+				// log(child.get('name'));
+				// log(child.get('px'));
+				// log('Parent - ' + child.get('parent').get('name'));
+				// log('Ems - ' + (child.get('px') / child.get('parent').get('px')));
+				// log('==');
+			});
+
+			// log(this.get('parent'));
+			// log(this.get('px'));
+			// log(this.get('children').length);
+			// log(this);
+			// log(this.get('parent'));
+			// log(this.attributes);
+		}
+	});
+
+	app.NodesCollection = Backbone.Collection.extend({
+		model: app.Node
+	});
+
+	app.App = Backbone.View.extend({
+		el: '.em-calc',
+
+		initialize: function() {
+			// Init a new node.
+			var node = new app.Node();
+			
+			// log(node.get('parent'));
+			// log(node.get('children').length);
+
+			// Add some child nodes to it.
+			node.get('children').add([
+				new app.Node({
+					name: 'div',
+					px: 20
+				}),
+				new app.Node({
+					name: 'span',
+					px: 40
+				})
+			]);
+
+			node.set('px', 16);
+		}
+	});
+
+	new app.App();
+
+	/*
 	app.Node = Backbone.RelationalModel.extend({
 		defaults: {
 			name: 'node',
@@ -95,26 +180,6 @@ var app = app || {};
 	app.NodesCollection = Backbone.Collection.extend({
 		model: app.Node
 	});
-
-	// app.SettingsView = Backbone.View.extend({
-	// 	el: '.settings',
-	// 
-	// 	initialize: function() {
-	// 		this.$basePx = this.$el.find('#base-px');
-	// 	},
-	// 
-	// 	events: {
-	// 		'submit form': 'setBasePx'
-	// 	},
-	// 
-	// 	setBasePx: function(event) {
-	// 		var px = parseInt(this.$basePx.val(), 10);
-	// 
-	// 		event.preventDefault();
-	// 
-	// 		this.model.set('px', px);
-	// 	}
-	// });
 
 	app.SetView = Backbone.View.extend({
 		tagName: 'ul',
@@ -225,5 +290,5 @@ var app = app || {};
 		}
 	});
 
-	new app.App();
+	new app.App();*/
 }());
