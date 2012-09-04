@@ -11,8 +11,9 @@ var app = app || {};
 
 	app.Node = Backbone.RelationalModel.extend({
 		defaults: {
-			name: 'html',
-			px: null
+			name: 'html', // HTML node name, e.g. html, body, div, p, etc.
+			target: 16, // Target pixel value
+			decimalPlaces: 4 // Number of decimal places for ems
 		},
 
 		relations: [
@@ -29,41 +30,43 @@ var app = app || {};
 		],
 
 		initialize: function() {
-			// Root nodes will have no parent so we can
-			// bind events to listen for changes on the
-			// "settings" model in here...
+			// * Root nodes will have no parent so we can
+			// * bind events to listen for changes on the
+			// * "settings" model in here...
 
-			this.bind('change:px', function() {
-				// We have children and something's changed
-				// so update all child models
-				if (this.get('children') && this.get('children').length) {
-					log('Pixels have changed!');
+			// Parent notifies its children when its target changes
+			this.bind('change:target', function() {
+				var children = this.get('children');
 
-					_.each(this.get('children').models, function(child) {
-						child.updateEm();
-						// log(model.get('name'));
-						// log(model.get('px'));
-						// log('Parent - ' + model.get('parent').get('name'));
-						// log('Ems - ' + (model.get('px') / model.get('parent').get('px')));
-						// log('==');
+				if (children && children.length) {
+					// Notify all children
+					_.each(children.models, function(child) {
+						child.setEm();
 					});
 				}
 			});
+		},
 
-			this.bind('add:children', function(child) {
-				// log(child.get('name'));
-				// log(child.get('px'));
-				// log('Parent - ' + child.get('parent').get('name'));
-				// log('Ems - ' + (child.get('px') / child.get('parent').get('px')));
-				// log('==');
-			});
+		setEm: function() {
+			var res,
+				target = this.get('target'),
+				context = this.get('parent').get('target');
 
-			// log(this.get('parent'));
-			// log(this.get('px'));
-			// log(this.get('children').length);
-			// log(this);
-			// log(this.get('parent'));
-			// log(this.attributes);
+			res = target / context;
+
+			this.set('em', res);
+			log(this.get('em'));
+
+			return res;
+		},
+
+		setDecimalPlaces: function() {
+			var em = this.get('em'),
+				decimalPlaces = this.get('decimalPlaces');
+
+			if (em) {
+				this.set('em', em.toFixed(decimalPlaces));
+			}
 		}
 	});
 
@@ -76,24 +79,22 @@ var app = app || {};
 
 		initialize: function() {
 			// Init a new node.
-			var node = new app.Node();
+			var rootNode = new app.Node();
 			
 			// log(node.get('parent'));
 			// log(node.get('children').length);
 
 			// Add some child nodes to it.
-			node.get('children').add([
+			rootNode.get('children').add([
 				new app.Node({
 					name: 'div',
-					px: 20
+					target: 20
 				}),
 				new app.Node({
 					name: 'span',
-					px: 40
+					target: 40
 				})
 			]);
-
-			node.set('px', 16);
 		}
 	});
 
