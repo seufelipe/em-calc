@@ -110,6 +110,38 @@ var app = app || {};
 		}
 	});
 
+	app.NodeView = Backbone.View.extend({
+		tagName: 'li',
+
+		className: 'node',
+
+		tmpl: _.template($('#node-tmpl').html()),
+
+		events: {
+			
+		},
+
+		initialize: function() {
+			this.render();
+		},
+
+		render: function() {
+			log('Rendering.');
+
+			return this;
+		}
+	});
+
+	app.NodeSetView = Backbone.View.extend({
+		tagName: 'ul',
+
+		className: 'set',
+
+		initialize: function() {
+			
+		}
+	});
+
 	app.App = Backbone.View.extend({
 		el: '.em-calc',
 
