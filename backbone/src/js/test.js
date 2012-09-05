@@ -33,7 +33,7 @@ var app = app || {};
 
 		initialize: function() {
 			// Parents notify their children when they have changed
-			this.bind('change:target', function(a, b) {
+			this.bind('change:target', function() {
 				var children = this.get('children');
 
 				if (children && children.length) {
