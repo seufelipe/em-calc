@@ -18,18 +18,16 @@ var app = app || {};
 			decimalPlaces: 4 // Number of decimal places for ems
 		},
 
-		relations: [
-			{
-				type: Backbone.HasMany,
-				key: 'children',
-				relatedModel: 'app.Node', // Its related model is itself...
-				collectionType: 'app.NodesCollection',
-				reverseRelation: {
-					type: Backbone.HasOne,
-					key: 'parent'
-				}
+		relations: [{
+			type: Backbone.HasMany,
+			key: 'children',
+			relatedModel: 'app.Node', // Its related model is itself...
+			collectionType: 'app.NodesCollection',
+			reverseRelation: {
+				type: Backbone.HasOne,
+				key: 'parent'
 			}
-		],
+		}],
 
 		initialize: function() {
 			// Parents notify their children when they have changed
