@@ -9,10 +9,12 @@ var app = app || {};
 		}
 	};
 
+	// --- Models ---
+
 	app.Node = Backbone.RelationalModel.extend({
 		defaults: {
-			name: 'html', // HTML node name, e.g. html, body, div, p, etc.
-			target: 16, // Target pixel value
+			name: '', // HTML node name, e.g. html, body, div, p, etc.
+			target: null, // Target pixel value
 			decimalPlaces: 4 // Number of decimal places for ems
 		},
 
@@ -30,12 +32,8 @@ var app = app || {};
 		],
 
 		initialize: function() {
-			// * Root nodes will have no parent so we can
-			// * bind events to listen for changes on the
-			// * "settings" model in here...
-
-			// Parent notifies its children when its target changes
-			this.bind('change:target', function() {
+			// Parents notify their children when they have changed
+			this.bind('change:target', function(a, b) {
 				var children = this.get('children');
 
 				if (children && children.length) {
@@ -70,8 +68,48 @@ var app = app || {};
 		}
 	});
 
+	// --- Collections ---
+
 	app.NodesCollection = Backbone.Collection.extend({
 		model: app.Node
+	});
+
+	// --- Views ---
+
+	app.SettingsView = Backbone.View.extend({
+		el: '.settings',
+
+		tmpl: _.template($('#settings-tmpl').html()),
+
+		events: {
+			'change #base-px': 'setBasePx',
+			'change #decimal-places': 'setDecimalPlaces'
+		},
+
+		initialize: function() {
+			this.render();
+
+			this.basePxField = this.$el.find('#base-px');
+			this.decimalPlacesField = this.$el.find('#decimal-places');
+		},
+
+		render: function() {
+			this.$el.append(this.tmpl(this.model.attributes));
+
+			return this;
+		},
+
+		setBasePx: function() {
+			var val = this.basePxField.val();
+
+			this.model.set('target', val);
+		},
+
+		setDecimalPlaces: function() {
+			var val = this.decimalPlacesField.val();
+
+			this.model.set('decimalPlaces', val);
+		}
 	});
 
 	app.App = Backbone.View.extend({
@@ -79,10 +117,10 @@ var app = app || {};
 
 		initialize: function() {
 			// Init a new node.
-			var rootNode = new app.Node();
-			
-			// log(node.get('parent'));
-			// log(node.get('children').length);
+			var rootNode = new app.Node({
+				name: 'html',
+				target: 16
+			});
 
 			// Add some child nodes to it.
 			rootNode.get('children').add([
@@ -95,6 +133,10 @@ var app = app || {};
 					target: 40
 				})
 			]);
+
+			app.settings = new app.SettingsView({
+				model: rootNode
+			});
 		}
 	});
 
@@ -215,7 +257,7 @@ var app = app || {};
 
 		className: 'node',
 
-		tmpl: _.template($('#node-template').html()),
+		tmpl: _.template($('#node-tmpl').html()),
 
 		events: {
 			'click .add-sibling': 'addSibling',
