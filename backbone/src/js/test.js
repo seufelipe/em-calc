@@ -13,9 +13,10 @@ var app = app || {};
 
 	app.Node = Backbone.RelationalModel.extend({
 		defaults: {
-			name: '', // HTML node name, e.g. html, body, div, p, etc.
+			name: 'div', // HTML node name, e.g. html, body, div, p, etc.
 			target: null, // Target pixel value
-			decimalPlaces: 4 // Number of decimal places for ems
+			decimalPlaces: 4, // Number of decimal places for ems
+			contextEl: '.list'
 		},
 
 		relations: [{
@@ -118,7 +119,9 @@ var app = app || {};
 		tmpl: _.template($('#node-tmpl').html()),
 
 		events: {
-			
+			'click .add-sibling': 'addSibling',
+			'click .add-child': 'addChild',
+			'click .delete': 'removeChild'
 		},
 
 		initialize: function() {
@@ -126,9 +129,43 @@ var app = app || {};
 		},
 
 		render: function() {
-			log('Rendering.');
+			this.$el.html(this.tmpl(this.model.attributes));
 
 			return this;
+		},
+
+		addSibling: function(event) {
+			var model = this.model,
+				parent = model.get('parent'),
+				set = parent.get('children'),
+				idx = set.indexOf(model);
+
+			event.stopPropagation();
+
+			set.add(new app.Node(), {
+				at: idx + 1
+			});
+		},
+
+		addChild: function(event) {
+			var set = new app.Node({
+					name: 'root',
+					contextEl: this.el
+				});
+
+			event.stopPropagation();
+
+			set.get('children').add(new app.Node({
+				name: 'div'
+			}));
+
+			new app.NodeSetView({
+				model: set
+			});
+		},
+
+		removeChild: function() {
+			log('Remove child');
 		}
 	});
 
@@ -138,35 +175,63 @@ var app = app || {};
 		className: 'set',
 
 		initialize: function() {
-			
-		}
+			_.bindAll(this);
+
+			this.contextEl = this.model.get('contextEl');
+			this.render();
+
+			// Re-render on add or remove.
+			this.model.bind('add:children', this.render);
+		},
+
+		render: function() {
+			var self = this,
+				children = this.model.get('children').models;
+
+			this.$el.html('');
+
+			_.each(children, function(childModel) {
+				self.$el.append(new app.NodeView({
+					model: childModel
+				}).render().el);
+			});
+
+			this.$el.appendTo(this.contextEl);
+		},
 	});
 
 	app.App = Backbone.View.extend({
 		el: '.em-calc',
 
 		initialize: function() {
+			this.$nodeList = this.$el.find('.list');
+
 			// Init a new node.
 			var rootNode = new app.Node({
-				name: 'html',
-				target: 16
+				name: 'root',
+				target: 16,
+				contextEl: this.$nodeList
+			});
+
+			app.settings = new app.SettingsView({
+				model: rootNode
+			});
+			
+			app.nodeNodeSetView = new app.NodeSetView({
+				model: rootNode
 			});
 
 			// Add some child nodes to it.
 			rootNode.get('children').add([
 				new app.Node({
-					name: 'div',
+					name: 'html',
 					target: 20
 				}),
 				new app.Node({
-					name: 'span',
+					name: 'body',
 					target: 40
 				})
 			]);
-
-			app.settings = new app.SettingsView({
-				model: rootNode
-			});
 		}
 	});
 
