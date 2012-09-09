@@ -136,8 +136,7 @@ var app = app || {};
 
 		addSibling: function(event) {
 			var model = this.model,
-				parent = model.get('parent'),
-				set = parent.get('children'),
+				set = model.get('parent').get('children'),
 				idx = set.indexOf(model);
 
 			event.stopPropagation();
@@ -164,8 +163,13 @@ var app = app || {};
 			});
 		},
 
-		removeChild: function() {
-			log('Remove child');
+		removeChild: function(event) {
+			var model = this.model,
+				set = model.get('parent').get('children');
+
+			event.stopPropagation();
+
+			set.remove(model);
 		}
 	});
 
@@ -182,6 +186,7 @@ var app = app || {};
 
 			// Re-render on add or remove.
 			this.model.bind('add:children', this.render);
+			this.model.bind('remove:children', this.render);
 		},
 
 		render: function() {
