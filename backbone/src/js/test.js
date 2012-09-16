@@ -119,6 +119,8 @@ var app = app || {};
 		tmpl: _.template($('#node-tmpl').html()),
 
 		events: {
+			'dblclick .name': 'toggleNameVisibility',
+			'blur input.node-name': 'updateNodeName',
 			'click .add-sibling': 'addSibling',
 			'click .add-child': 'addChild',
 			'click .delete': 'removeChild'
@@ -131,7 +133,29 @@ var app = app || {};
 		render: function() {
 			this.$el.html(this.tmpl(this.model.attributes));
 
+			this.$name = this.$el.find('.name');
+			this.$nodeNameField = this.$el.find('input.node-name');
+
 			return this;
+		},
+
+		toggleNameVisibility: function() {
+			if (this.$name.is(':visible')) {
+				this.$el.find('.name').hide();
+				this.$nodeNameField.show().select();
+			} else {
+				this.$name.show();
+				this.$nodeNameField.hide();
+			}
+		},
+
+		updateNodeName: function() {
+			var val = this.$nodeNameField.val();
+
+			this.model.set('name', val);
+			this.$name.text(val);
+
+			this.toggleNameVisibility();
 		},
 
 		addSibling: function(event) {
@@ -170,6 +194,8 @@ var app = app || {};
 			event.stopPropagation();
 
 			set.remove(model);
+
+			this.$el.remove();
 		}
 	});
 
@@ -186,7 +212,7 @@ var app = app || {};
 
 			// Re-render on add or remove.
 			this.model.bind('add:children', this.render);
-			this.model.bind('remove:children', this.render);
+			// this.model.bind('remove:children', this.render);
 		},
 
 		render: function() {
@@ -202,7 +228,7 @@ var app = app || {};
 			});
 
 			this.$el.appendTo(this.contextEl);
-		},
+		}
 	});
 
 	app.App = Backbone.View.extend({
