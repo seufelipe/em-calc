@@ -127,7 +127,6 @@ var app = app || {};
 		},
 
 		initialize: function() {
-			log(this.model.get('parent'));
 			this.render();
 		},
 
@@ -213,7 +212,6 @@ var app = app || {};
 
 			// Re-render on add or remove.
 			this.model.bind('add:children', this.render);
-			// this.model.bind('remove:children', this.render);
 		},
 
 		render: function() {
@@ -254,16 +252,12 @@ var app = app || {};
 			});
 
 			// Add some child nodes to it.
-			rootNode.get('children').add([
+			rootNode.get('children').add(
 				new app.Node({
 					name: 'html',
 					target: 20
-				}),
-				new app.Node({
-					name: 'body',
-					target: 40
 				})
-			]);
+			);
 		}
 	});
 
