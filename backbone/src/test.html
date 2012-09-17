@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="en-gb">
+	<head>
+		<meta charset="utf-8" />
+		<title>Em Calculator</title>
+
+		<link href="css/screen.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<div class="wrap em-calc">
+			<h1>Em Calculator</h1>
+
+			<div class="settings">
+				<h2>Settings</h2>
+			</div>
+
+			<div class="list"></div>
+		</div>
+
+		<script id="node-tmpl" type="text/template">
+			<div class="node-body">
+				<span class="node-name">
+					<span class="name" title="Change node name"><%= name %></span>
+					<input class="text node-name" type="text" value="<%= name %>" />
+				</span> {
+				<input class="text target" type="text" value="<%= target %>" />
+				px = <input class="text em" type="text" value="" readonly /> }
+
+				<button class="add-sibling">Add</button>
+				<button class="add-child">Add Sub</button>
+				<span class="delete">&times;</span>
+			</div>
+		</script>
+
+		<script id="settings-tmpl" type="text/template">
+			<fieldset>
+				<legend>Settings</legend>
+
+				<div class="field">
+					<label for="base-px">Base px size:</label>
+					<input id="base-px" type="number" value="<%= target %>" />
+				</div>
+				<div class="field">
+					<label for="decimal-places">Decimal places:</label>
+					<input id="decimal-places" type="number" value="<%= decimalPlaces %>" />
+				</div>
+			</fieldset>
+		</script>
+
+		<script src="js/libs/jquery-1.8.0.min.js"></script>
+		<script src="js/libs/underscore-min.js"></script>
+		<script src="js/libs/backbone-min.js"></script>
+		<script src="js/libs/backbone-relational.js"></script>
+		<script src="js/test.js"></script>
+	</body>
+</html>
