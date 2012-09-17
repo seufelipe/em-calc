@@ -31,8 +31,12 @@ var app = app || {};
 		}],
 
 		initialize: function() {
-			// Parents notify their children when they have changed
 			this.bind('change:target', function() {
+				this.setEm();
+			});
+
+			// Parents notify their children when they have changed
+			/*this.bind('change:target', function() {
 				var children = this.get('children');
 
 				if (children && children.length) {
@@ -41,7 +45,7 @@ var app = app || {};
 						child.setEm();
 					});
 				}
-			});
+			});*/
 		},
 
 		setEm: function() {
@@ -52,7 +56,7 @@ var app = app || {};
 			res = target / context;
 
 			this.set('em', res);
-			log(this.get('em'));
+			// log(this.get('em'));
 
 			return res;
 		},
@@ -121,20 +125,26 @@ var app = app || {};
 		events: {
 			'dblclick .name': 'toggleNameVisibility',
 			'blur input.node-name': 'updateNodeName',
+			'change input.target': 'updateTarget',
 			'click .add-sibling': 'addSibling',
 			'click .add-child': 'addChild',
 			'click .delete': 'removeChild'
 		},
 
 		initialize: function() {
+			_.bindAll(this);
+
 			this.render();
+
+			this.model.bind('change:em', this.updateEmField);
 		},
 
 		render: function() {
 			this.$el.html(this.tmpl(this.model.attributes));
 
-			this.$name = this.$el.find('.name');
-			this.$nodeNameField = this.$el.find('input.node-name');
+			this.$name = this.$el.find('.name:first');
+			this.$nodeNameField = this.$el.find('input.node-name:first');
+			this.$target = this.$el.find('input.target');
 
 			return this;
 		},
@@ -160,6 +170,18 @@ var app = app || {};
 			this.$name.text(val);
 
 			this.toggleNameVisibility(event);
+		},
+
+		updateTarget: function() {
+			var target = parseInt(this.$target.val(), 10);
+
+			this.model.set('target', target);
+		},
+
+		updateEmField: function() {
+			var em = this.model.get('em');
+
+			this.$el.find('.em').val(em + 'em');
 		},
 
 		addSibling: function(event) {
@@ -258,8 +280,7 @@ var app = app || {};
 			// Add some child nodes to it.
 			rootNode.get('children').add(
 				new app.Node({
-					name: 'html',
-					target: 20
+					name: 'html'
 				})
 			);
 		}
