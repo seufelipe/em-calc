@@ -15,7 +15,7 @@ var app = app || {};
 		defaults: {
 			name: 'div', // HTML node name, e.g. html, body, div, p, etc.
 			target: null, // Target pixel value
-			decimalPlaces: 4, // Number of decimal places for ems
+			decimalPlaces: 3, // Number of decimal places for ems
 			contextEl: '.list'
 		},
 
