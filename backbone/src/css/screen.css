@@ -45,6 +45,7 @@ textarea {
 
 body {
 	margin: 0;
+	color: #222;
 	font-size: 1em;
 	line-height: 1.4;
 }
@@ -255,7 +256,23 @@ body {font-size: 0.75em;}
 	width: 700px;
 }
 
-.node .text {width: 70px;}
+/* --- Node Sets --- */
+
+.set {
+	padding: 0;
+	list-style-type: none;
+}
+
+.set .set {margin: 0 0 0 40px;}
+
+.node-body {
+	margin-bottom: 10px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	background-color: #ededed;
+}
+
+.node .text {width: 50px;}
 
 .name {cursor: default;}
 
