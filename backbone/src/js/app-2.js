@@ -159,7 +159,7 @@ var app = app || {};
 			this.model.set('name', val);
 			this.$name.text(val);
 
-			this.toggleNameVisibility();
+			this.toggleNameVisibility(event);
 		},
 
 		addSibling: function(event) {
