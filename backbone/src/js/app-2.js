@@ -139,7 +139,9 @@ var app = app || {};
 			return this;
 		},
 
-		toggleNameVisibility: function() {
+		toggleNameVisibility: function(event) {
+			event.stopPropagation();
+
 			if (this.$name.is(':visible')) {
 				this.$el.find('.name').hide();
 				this.$nodeNameField.show().select();
@@ -149,8 +151,10 @@ var app = app || {};
 			}
 		},
 
-		updateNodeName: function() {
+		updateNodeName: function(event) {
 			var val = this.$nodeNameField.val();
+
+			event.stopPropagation();
 
 			this.model.set('name', val);
 			this.$name.text(val);
