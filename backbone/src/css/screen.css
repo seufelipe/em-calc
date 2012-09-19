@@ -164,6 +164,7 @@ fieldset {
 label {cursor: pointer;}
 
 legend {
+	display: none;
 	border: 0;
 	*margin-left: -7px;
 	padding: 0;
@@ -245,6 +246,55 @@ td {vertical-align: top;}
 
 
 /*
+	Helper Classes
+	--------------------------------------------------
+*/
+
+/* --- Media --- */
+
+.media {
+	content: "";
+	display: table;
+}
+.media:after {clear: both;}
+
+.m-unit-1 {
+	float: left;
+	margin-right: 1em;
+}
+
+.m-unit-main {
+	display: table-cell;
+	width: 10000px;
+	*display: block;
+	*width: auto;
+	zoom: 1;
+}
+
+.ir {
+	border: 0;
+	font: 0/0 a;
+	text-shadow: none;
+	color: transparent;
+	background-color: transparent;
+}
+
+.hidden {
+	display: none !important;
+	visibility: hidden;
+}
+
+.invisible {visibility: hidden;}
+
+.cf:before,
+.cf:after {
+	content: "";
+	display: table;
+}
+.cf:after {clear: both;}
+
+
+/*
 	Structure
 	--------------------------------------------------
 */
@@ -255,6 +305,22 @@ body {font-size: 0.75em;}
 	margin: 10px;
 	width: 700px;
 }
+
+/* --- Settings --- */
+
+.settings {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #ccc;
+}
+
+.field {margin-bottom: 10px;}
+
+.f-label {
+	width: 100px;
+	text-align: right;
+}
+
+.field .text {width: 50px;}
 
 /* --- Node Sets --- */
 
@@ -284,34 +350,4 @@ input.node-name {display: none;}
 	display: inline-block;
 	margin-left: 2px;
 }
-
 .delete:hover {opacity: 0.4;}
-
-
-/*
-	Helper Classes
-	--------------------------------------------------
-*/
-
-.ir {
-	border: 0;
-	font: 0/0 a;
-	text-shadow: none;
-	color: transparent;
-	background-color: transparent;
-}
-
-.hidden {
-	display: none !important;
-	visibility: hidden;
-}
-
-.invisible {visibility: hidden;}
-
-.cf:before,
-.cf:after {
-	content: "";
-	display: table;
-}
-
-.cf:after {clear: both;}

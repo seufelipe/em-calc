@@ -38,14 +38,18 @@
 			<fieldset>
 				<legend>Settings</legend>
 
-				<div class="field">
-					<label for="base-px">Default font size:</label>
-					<input id="base-px" type="number" value="<%= target %>" />
-					<span>px</span>
+				<div class="field media">
+					<label class="f-label m-unit-1" for="base-px">Default font size:</label>
+					<div class="m-unit-main">
+						<input class="text" id="base-px" type="number" value="<%= target %>" />
+						<span>px</span>
+					</div>
 				</div>
-				<div class="field">
-					<label for="decimal-places">Decimal places:</label>
-					<input id="decimal-places" type="number" value="<%= decimalPlaces %>" />
+				<div class="field media">
+					<label class="f-label m-unit-1" for="decimal-places">Decimal places:</label>
+					<div class="m-unit-main">
+						<input class="text" id="decimal-places" type="number" value="<%= decimalPlaces %>" />
+					</div>
 				</div>
 			</fieldset>
 		</script>
