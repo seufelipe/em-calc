@@ -126,6 +126,7 @@ var app = app || {};
 			'dblclick .name': 'toggleNameVisibility',
 			'blur input.node-name': 'updateNodeName',
 			'change input.target': 'updateTarget',
+			'focus input.em': 'selectEm',
 			'click .add-sibling': 'addSibling',
 			'click .add-child': 'addChild',
 			'click .delete': 'removeChild'
@@ -144,7 +145,8 @@ var app = app || {};
 
 			this.$name = this.$el.find('.name:first');
 			this.$nodeNameField = this.$el.find('input.node-name:first');
-			this.$target = this.$el.find('input.target');
+			this.$targetField = this.$el.find('input.target');
+			this.$emField = this.$el.find('input.em');
 
 			return this;
 		},
@@ -173,9 +175,13 @@ var app = app || {};
 		},
 
 		updateTarget: function() {
-			var target = parseInt(this.$target.val(), 10);
+			var target = parseInt(this.$targetField.val(), 10);
 
 			this.model.set('target', target);
+		},
+
+		selectEm: function() {
+			this.$emField.select();
 		},
 
 		updateEmField: function() {
@@ -236,7 +242,7 @@ var app = app || {};
 			this.contextEl = this.model.get('contextEl');
 			this.render();
 
-			// Re-render on add or remove.
+			// Re-render on add.
 			this.model.bind('add:children', this.render);
 		},
 
