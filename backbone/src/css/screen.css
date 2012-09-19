@@ -314,6 +314,7 @@ body {font-size: 0.75em;}
 }
 
 .field {margin-bottom: 10px;}
+.field:last-child {margin-bottom: 0;}
 
 .f-label {
 	width: 100px;
@@ -340,7 +341,10 @@ body {font-size: 0.75em;}
 
 .node .text {width: 50px;}
 
-.name {cursor: default;}
+.name,
+.em {
+	cursor: default;
+}
 
 input.node-name {display: none;}
 
