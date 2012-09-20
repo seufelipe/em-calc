@@ -22,7 +22,7 @@ var app = app || {};
 		relations: [{
 			type: Backbone.HasMany,
 			key: 'children',
-			relatedModel: 'app.Node', // Its related model is itself...
+			relatedModel: 'app.Node', // Its related model is itself... ???
 			collectionType: 'app.NodesCollection',
 			reverseRelation: {
 				type: Backbone.HasOne,
@@ -137,6 +137,9 @@ var app = app || {};
 
 			this.render();
 
+			this.parent = this.model.get('parent');
+			this.siblings = this.parent.get('children');
+
 			this.model.bind('change:em', this.updateEmField);
 		},
 
@@ -191,13 +194,11 @@ var app = app || {};
 		},
 
 		addSibling: function(event) {
-			var model = this.model,
-				set = model.get('parent').get('children'),
-				idx = set.indexOf(model);
+			var idx = this.siblings.indexOf(this.model);
 
 			event.stopPropagation();
 
-			set.add(new app.Node(), {
+			this.siblings.add(new app.Node(), {
 				at: idx + 1
 			});
 		},
@@ -220,12 +221,9 @@ var app = app || {};
 		},
 
 		removeChild: function(event) {
-			var model = this.model,
-				set = model.get('parent').get('children');
-
 			event.stopPropagation();
 
-			set.remove(model);
+			this.siblings.remove(this.model);
 
 			this.$el.remove();
 		}
