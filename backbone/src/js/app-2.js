@@ -1,6 +1,6 @@
 var app = app || {};
 
-(function() {
+(function(app, Backbone, window, document) {
 	'use strict';
 
 	// Quick log func for debugging
@@ -51,6 +51,7 @@ var app = app || {};
 			});*/
 		},
 
+		// Calculate em and set it
 		setEm: function() {
 			var res,
 				target = this.get('target'),
@@ -298,4 +299,4 @@ var app = app || {};
 	});
 
 	new app.App();
-}());
+}(app, Backbone, window, document));
