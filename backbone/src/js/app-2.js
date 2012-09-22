@@ -3,6 +3,7 @@ var app = app || {};
 (function() {
 	'use strict';
 
+	// Quick log func for debugging
 	var log = function(message) {
 		if (window.console && window.console.log) {
 			window.console.log(message);
@@ -31,6 +32,8 @@ var app = app || {};
 		}],
 
 		initialize: function() {
+			// Any changes to the target px
+			// should trigger a re-calc of ems
 			this.bind('change:target', function() {
 				this.setEm();
 			});
@@ -58,6 +61,7 @@ var app = app || {};
 			this.set('em', res);
 			// log(this.get('em'));
 
+			// Also return "res" just incase
 			return res;
 		},
 
@@ -144,8 +148,11 @@ var app = app || {};
 		},
 
 		render: function() {
+			// Insert the template
 			this.$el.html(this.tmpl(this.model.attributes));
 
+			// Set some jQuery references here. Can't do it in
+			// initialize because the template won't have been rendered
 			this.$name = this.$el.find('.name:first');
 			this.$nodeNameField = this.$el.find('input.node-name:first');
 			this.$targetField = this.$el.find('input.target');
