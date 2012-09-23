@@ -152,10 +152,10 @@ var app = app || {};
 			// Insert the template
 			this.$el.html(this.tmpl(this.model.attributes));
 
-			// Set some jQuery references here. Can't do it in
+			// Set some jQuery references here. Can't set these up in
 			// initialize because the template won't have been rendered
-			this.$name = this.$el.find('.name:first');
-			this.$nodeNameField = this.$el.find('input.node-name:first');
+			this.$name = this.$el.find('.name');
+			this.$nodeNameField = this.$el.find('input.node-name');
 			this.$targetField = this.$el.find('input.target');
 			this.$emField = this.$el.find('input.em');
 
@@ -166,11 +166,15 @@ var app = app || {};
 			event.stopPropagation();
 
 			if (this.$name.is(':visible')) {
+				// Name is visible so hide it, show the edit
+				// name field and select its value
 				this.$el.find('.name').hide();
 				this.$nodeNameField.show().select();
 			} else {
-				this.$name.show();
+				// Otherwise, hide the field and show
+				// the name as text
 				this.$nodeNameField.hide();
+				this.$name.show();
 			}
 		},
 
