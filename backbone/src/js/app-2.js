@@ -261,7 +261,7 @@ var app = app || {};
 		},
 
 		renderNode: function(model) {
-			var idx = this.model.get('children').indexOf(model),
+			var idx = this.model.get('children').indexOf(model) - 1,
 				node = new app.NodeView({
 					model: model
 				}).render().el;
@@ -269,7 +269,7 @@ var app = app || {};
 			if (idx === 0) {
 				this.$el.append(node);
 			} else {
-				$(node).insertAfter(this.$el.find('li:eq(' + (idx - 1) + ')'));
+				$(node).insertAfter(this.$el.find('li:eq(' + idx + ')'));
 			}
 		}
 	});
