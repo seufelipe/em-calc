@@ -223,13 +223,13 @@ var app = app || {};
 
 			event.stopPropagation();
 
-			set.get('children').add(new app.Node({
-				name: 'div'
-			}));
-
 			new app.NodeSetView({
 				model: set
 			});
+
+			set.get('children').add(new app.Node({
+				name: 'div'
+			}));
 		},
 
 		removeChild: function(event) {
@@ -249,26 +249,28 @@ var app = app || {};
 		initialize: function() {
 			_.bindAll(this);
 
-			this.contextEl = this.model.get('contextEl');
+			this.$contextEl = this.model.get('contextEl');
 			this.render();
 
-			// Re-render on add.
-			this.model.bind('add:children', this.render);
+			// Render new node when added.
+			this.model.bind('add:children', this.renderNode);
 		},
 
 		render: function() {
-			var self = this,
-				children = this.model.get('children').models;
+			this.$el.appendTo(this.$contextEl);
+		},
 
-			this.$el.html('');
+		renderNode: function(model) {
+			var idx = this.model.get('children').indexOf(model),
+				node = new app.NodeView({
+					model: model
+				}).render().el;
 
-			_.each(children, function(childModel) {
-				self.$el.append(new app.NodeView({
-					model: childModel
-				}).render().el);
-			});
-
-			this.$el.appendTo(this.contextEl);
+			if (idx === 0) {
+				this.$el.append(node);
+			} else {
+				$(node).insertAfter(this.$el.find('li:eq(' + (idx - 1) + ')'));
+			}
 		}
 	});
 
