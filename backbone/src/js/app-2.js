@@ -250,10 +250,10 @@ var app = app || {};
 			_.bindAll(this);
 
 			this.$contextEl = this.model.get('contextEl');
-			this.render();
-
 			// Render new node when added.
 			this.model.bind('add:children', this.renderNode);
+
+			this.render();
 		},
 
 		render: function() {
@@ -261,7 +261,7 @@ var app = app || {};
 		},
 
 		renderNode: function(model) {
-			var idx = this.model.get('children').indexOf(model) - 1,
+			var idx = this.model.get('children').indexOf(model),
 				node = new app.NodeView({
 					model: model
 				}).render().el;
@@ -269,7 +269,7 @@ var app = app || {};
 			if (idx === 0) {
 				this.$el.append(node);
 			} else {
-				$(node).insertAfter(this.$el.find('li:eq(' + idx + ')'));
+				$(node).insertAfter(this.$el.find('li:eq(' + (idx - 1) + ')'));
 			}
 		}
 	});
