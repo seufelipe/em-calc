@@ -353,5 +353,9 @@ input.node-name {display: none;}
 	cursor: pointer;
 	display: inline-block;
 	margin-left: 2px;
+	-webkit-transition: opacity 0.1s ease-in;
+	   -moz-transition: opacity 0.1s ease-in;
+		-ms-transition: opacity 0.1s ease-in;
+			transition: opacity 0.1s ease-in;
 }
 .delete:hover {opacity: 0.4;}
