@@ -12,6 +12,8 @@ var app = app || {};
 
 	// --- Models ---
 
+	app.Models = {};
+
 	app.Node = Backbone.RelationalModel.extend({
 		defaults: {
 			name: 'div', // HTML node name, e.g. html, body, div, p, etc.
@@ -78,11 +80,15 @@ var app = app || {};
 
 	// --- Collections ---
 
+	app.Collections = {};
+
 	app.NodesCollection = Backbone.Collection.extend({
 		model: app.Node
 	});
 
 	// --- Views ---
+
+	app.Views = {};
 
 	app.SettingsView = Backbone.View.extend({
 		el: '.settings',
@@ -250,6 +256,7 @@ var app = app || {};
 			_.bindAll(this);
 
 			this.$contextEl = this.model.get('contextEl');
+			this.children = this.model.get('children');
 			// Render new node when added.
 			this.model.bind('add:children', this.renderNode);
 
@@ -261,15 +268,19 @@ var app = app || {};
 		},
 
 		renderNode: function(model) {
-			var idx = this.model.get('children').indexOf(model),
+			var idx = this.children.indexOf(model),
 				node = new app.NodeView({
 					model: model
 				}).render().el;
 
 			if (idx === 0) {
+				// If this is the first node to be added
+				// then just append it to the <ul />
 				this.$el.append(node);
 			} else {
-				$(node).insertAfter(this.$el.find('li:eq(' + (idx - 1) + ')'));
+				// Otherwise, find the previous child
+				// and insert it after that.
+				$(node).insertAfter(this.$el.find(':eq(' + (idx - 1) + ')'));
 			}
 		}
 	});
@@ -304,5 +315,6 @@ var app = app || {};
 		}
 	});
 
+	// Go!
 	new app.App();
 }(app, Backbone, window, document));
