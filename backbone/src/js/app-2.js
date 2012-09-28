@@ -174,7 +174,7 @@ var app = app || {};
 			if (this.$name.is(':visible')) {
 				// Name is visible so hide it, show the edit
 				// name field and select its value
-				this.$el.find('.name').hide();
+				this.$name.hide();
 				this.$nodeNameField.show().select();
 			} else {
 				// Otherwise, hide the field and show
