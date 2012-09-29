@@ -14,7 +14,7 @@ var app = app || {};
 
 	app.Models = {};
 
-	app.Node = Backbone.RelationalModel.extend({
+	app.Models.Node = Backbone.RelationalModel.extend({
 		defaults: {
 			name: 'div', // HTML node name, e.g. html, body, div, p, etc.
 			target: null, // Target pixel value
@@ -25,8 +25,8 @@ var app = app || {};
 		relations: [{
 			type: Backbone.HasMany,
 			key: 'children',
-			relatedModel: 'app.Node', // Its related model is itself... ???
-			collectionType: 'app.NodesCollection',
+			relatedModel: 'app.Models.Node', // Its related model is itself... ???
+			collectionType: 'app.Collections.NodesCollection',
 			reverseRelation: {
 				type: Backbone.HasOne,
 				key: 'parent'
@@ -82,15 +82,15 @@ var app = app || {};
 
 	app.Collections = {};
 
-	app.NodesCollection = Backbone.Collection.extend({
-		model: app.Node
+	app.Collections.NodesCollection = Backbone.Collection.extend({
+		model: app.Models.Node
 	});
 
 	// --- Views ---
 
 	app.Views = {};
 
-	app.SettingsView = Backbone.View.extend({
+	app.Views.SettingsView = Backbone.View.extend({
 		el: '.settings',
 
 		tmpl: _.template($('#settings-tmpl').html()),
@@ -126,7 +126,7 @@ var app = app || {};
 		}
 	});
 
-	app.NodeView = Backbone.View.extend({
+	app.Views.NodeView = Backbone.View.extend({
 		tagName: 'li',
 
 		className: 'node',
@@ -216,24 +216,24 @@ var app = app || {};
 
 			event.stopPropagation();
 
-			this.siblings.add(new app.Node(), {
+			this.siblings.add(new app.Models.Node(), {
 				at: idx + 1
 			});
 		},
 
 		addChild: function(event) {
-			var set = new app.Node({
+			var set = new app.Models.Node({
 					name: 'root',
 					contextEl: this.el
 				});
 
 			event.stopPropagation();
 
-			new app.NodeSetView({
+			new app.Views.NodeSetView({
 				model: set
 			});
 
-			set.get('children').add(new app.Node({
+			set.get('children').add(new app.Models.Node({
 				name: 'div'
 			}));
 		},
@@ -247,7 +247,7 @@ var app = app || {};
 		}
 	});
 
-	app.NodeSetView = Backbone.View.extend({
+	app.Views.NodeSetView = Backbone.View.extend({
 		tagName: 'ul',
 
 		className: 'set',
@@ -269,7 +269,7 @@ var app = app || {};
 
 		renderNode: function(model) {
 			var idx = this.children.indexOf(model),
-				node = new app.NodeView({
+				node = new app.Views.NodeView({
 					model: model
 				}).render().el;
 
@@ -285,30 +285,30 @@ var app = app || {};
 		}
 	});
 
-	app.App = Backbone.View.extend({
+	app.Views.App = Backbone.View.extend({
 		el: '.em-calc',
 
 		initialize: function() {
 			this.$nodeList = this.$el.find('.list');
 
 			// Init a new node.
-			var rootNode = new app.Node({
+			var rootNode = new app.Models.Node({
 				name: 'root',
 				target: 16,
 				contextEl: this.$nodeList
 			});
 
-			app.settings = new app.SettingsView({
+			app.settings = new app.Views.SettingsView({
 				model: rootNode
 			});
 			
-			app.nodeNodeSetView = new app.NodeSetView({
+			app.nodeNodeSetView = new app.Views.NodeSetView({
 				model: rootNode
 			});
 
 			// Add some child nodes to it.
 			rootNode.get('children').add(
-				new app.Node({
+				new app.Models.Node({
 					name: 'html'
 				})
 			);
@@ -316,5 +316,5 @@ var app = app || {};
 	});
 
 	// Go!
-	new app.App();
+	new app.Views.App();
 }(app, Backbone, window, document));
