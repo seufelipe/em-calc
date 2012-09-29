@@ -1,230 +1,320 @@
-(function($, Backbone, window, document, undefined) {
-	var app = app || {};
+var app = app || {};
 
+(function(app, Backbone, window, document) {
+	'use strict';
+
+	// Quick log func for debugging
 	var log = function(message) {
 		if (window.console && window.console.log) {
 			window.console.log(message);
 		}
 	};
 
-	// Node model.
-	var Node = Backbone.Model.extend({
+	// --- Models ---
+
+	app.Models = {};
+
+	app.Models.Node = Backbone.RelationalModel.extend({
 		defaults: {
-			name: 'node',
-			px: '',
-			em: 1,
-			context: 16
+			name: 'div', // HTML node name, e.g. html, body, div, p, etc.
+			target: null, // Target pixel value
+			decimalPlaces: 3, // Number of decimal places for ems
+			contextEl: '.list'
 		},
+
+		relations: [{
+			type: Backbone.HasMany,
+			key: 'children',
+			relatedModel: 'app.Models.Node', // Its related model is itself... ???
+			collectionType: 'app.Collections.NodesCollection',
+			reverseRelation: {
+				type: Backbone.HasOne,
+				key: 'parent'
+			}
+		}],
 
 		initialize: function() {
-			this.bind('change:px', function() {
-				var px = this.get('px');
-
-				// Re-calc the ems once the pixels have been changed.
-				this.calcEms(px, 16); // Hardcoded the context at "16" for now.
+			// Any changes to the target px
+			// should trigger a re-calc of ems
+			this.bind('change:target', function() {
+				this.setEm();
 			});
+
+			// Parents notify their children when they have changed
+			/*this.bind('change:target', function() {
+				var children = this.get('children');
+
+				if (children && children.length) {
+					// Notify all children
+					_.each(children.models, function(child) {
+						child.setEm();
+					});
+				}
+			});*/
 		},
 
-		calcEms: function(target, context) {
-			if ($.isNumeric(target)) { // Don't bother if target's not a number.
-				var result = target / context;
+		// Calculate em and set it
+		setEm: function() {
+			var res,
+				target = this.get('target'),
+				context = this.get('parent').get('target');
 
-				this.set({
-					'px': target,
-					'em': result
-				});
+			res = target / context;
+
+			this.set('em', res);
+			// log(this.get('em'));
+
+			// Also return "res" just incase
+			return res;
+		},
+
+		setDecimalPlaces: function() {
+			var em = this.get('em'),
+				decimalPlaces = this.get('decimalPlaces');
+
+			if (em) {
+				this.set('em', em.toFixed(decimalPlaces));
 			}
 		}
 	});
 
-	// Nodes collection.
-	var Nodes = Backbone.Collection.extend({
+	// --- Collections ---
+
+	app.Collections = {};
+
+	app.Collections.NodesCollection = Backbone.Collection.extend({
+		model: app.Models.Node
+	});
+
+	// --- Views ---
+
+	app.Views = {};
+
+	app.Views.SettingsView = Backbone.View.extend({
+		el: '.settings',
+
+		tmpl: _.template($('#settings-tmpl').html()),
+
+		events: {
+			'change #base-px': 'setBasePx',
+			'change #decimal-places': 'setDecimalPlaces'
+		},
+
 		initialize: function() {
-			this.add(new Node());
+			this.render();
+
+			this.basePxField = this.$el.find('#base-px');
+			this.decimalPlacesField = this.$el.find('#decimal-places');
+		},
+
+		render: function() {
+			this.$el.append(this.tmpl(this.model.attributes));
+
+			return this;
+		},
+
+		setBasePx: function() {
+			var val = this.basePxField.val();
+
+			this.model.set('target', val);
+		},
+
+		setDecimalPlaces: function() {
+			var val = this.decimalPlacesField.val();
+
+			this.model.set('decimalPlaces', val);
 		}
 	});
 
-	// Node view.
-	var NodeView = Backbone.View.extend({
+	app.Views.NodeView = Backbone.View.extend({
 		tagName: 'li',
 
 		className: 'node',
 
-		tmpl: _.template($('#node-template').html()),
+		tmpl: _.template($('#node-tmpl').html()),
 
 		events: {
-			'dblclick .name': 'toggleNodeName',
+			'dblclick .name': 'toggleNameVisibility',
 			'blur input.node-name': 'updateNodeName',
-			'change .px': 'updatePx',
+			'change input.target': 'updateTarget',
+			'focus input.em': 'selectEm',
 			'click .add-sibling': 'addSibling',
 			'click .add-child': 'addChild',
-			'click .delete': 'delete'
+			'click .delete': 'removeChild'
 		},
 
 		initialize: function() {
+			_.bindAll(this);
+
 			this.render();
+
+			this.parent = this.model.get('parent');
+			this.siblings = this.parent.get('children');
+
+			this.model.bind('change:em', this.updateEmField);
 		},
 
 		render: function() {
+			// Insert the template
 			this.$el.html(this.tmpl(this.model.attributes));
+
+			// Set some jQuery references here. Can't set these up in
+			// initialize because the template won't have been rendered
+			this.$name = this.$el.find('.name');
+			this.$nodeNameField = this.$el.find('input.node-name');
+			this.$targetField = this.$el.find('input.target');
+			this.$emField = this.$el.find('input.em');
 
 			return this;
 		},
 
-		toggleNodeName: function() {
-			var $el = this.$el,
-				$name = $el.find('.name'),
-				$node_name = $el.find('input.node-name');
-		
-			if ($name.is(':visible')) {
-				$name.hide();
-				$node_name.show().select();
+		toggleNameVisibility: function(event) {
+			event.stopPropagation();
+
+			if (this.$name.is(':visible')) {
+				// Name is visible so hide it, show the edit
+				// name field and select its value
+				this.$name.hide();
+				this.$nodeNameField.show().select();
 			} else {
-				$name.show();
-				$node_name.hide();
+				// Otherwise, hide the field and show
+				// the name as text
+				this.$nodeNameField.hide();
+				this.$name.show();
 			}
 		},
 
-		updateNodeName: function() {
-			var val = this.$el.find('input.node-name').val(),
-				$name = this.$el.find('.name');
-		
+		updateNodeName: function(event) {
+			var val = this.$nodeNameField.val();
+
+			event.stopPropagation();
+
 			this.model.set('name', val);
-			$name.text(val);
-		
-			this.toggleNodeName();
-		},
-	
-		updatePx: function() {
-			var $px_field = this.$el.find('input.px'),
-				val = parseInt($px_field.val(), 10);
+			this.$name.text(val);
 
-			// Update px field with the parsed integer
-			// to remove any non-numeric characters.
-			$px_field.val(val);
-
-			this.model.set('px', val);
-
-			this.updateEm();
+			this.toggleNameVisibility(event);
 		},
 
-		updateEm: function() {
-			this.$el.find('input.ems').val(this.model.get('em') + 'em');
+		updateTarget: function() {
+			var target = parseInt(this.$targetField.val(), 10);
+
+			this.model.set('target', target);
 		},
 
-		// Add new sibling node.
-		addSibling: function() {
-			// Get the current node's index.
-			var idx = app.nodesView.collection.indexOf(this.model);
+		selectEm: function() {
+			this.$emField.select();
+		},
 
-			// Add a new one after it.
-			app.nodesView.collection.add(new Node(), {
+		updateEmField: function() {
+			var em = this.model.get('em');
+
+			this.$el.find('.em').val(em + 'em');
+		},
+
+		addSibling: function(event) {
+			var idx = this.siblings.indexOf(this.model);
+
+			event.stopPropagation();
+
+			this.siblings.add(new app.Models.Node(), {
 				at: idx + 1
 			});
 		},
 
-		// A new child node list.
-		addChild: function() {
-			log('Add child');
+		addChild: function(event) {
+			var set = new app.Models.Node({
+					name: 'root',
+					contextEl: this.el
+				});
 
-			// this.subNodeList = new NodesView({
-			// 	context: this.$el
-			// });
-			// 
-			// log(this.subNodeList.context);
+			event.stopPropagation();
+
+			new app.Views.NodeSetView({
+				model: set
+			});
+
+			set.get('children').add(new app.Models.Node({
+				name: 'div'
+			}));
 		},
 
-		// Delete a node.
-		delete: function() {
-			var collection = app.nodesView.collection;
+		removeChild: function(event) {
+			event.stopPropagation();
 
-			if (collection.length > 1) { // Don't remove if only one node remains.
-				collection.remove(this.model);
-			}
+			this.siblings.remove(this.model);
+
+			this.$el.remove();
 		}
 	});
 
-	// Node collection view.
-	var NodesView = Backbone.View.extend({
+	app.Views.NodeSetView = Backbone.View.extend({
 		tagName: 'ul',
 
-		className: 'node-list',
-
-		context: '.list',
+		className: 'set',
 
 		initialize: function() {
-			// Bind methods to this.
 			_.bindAll(this);
 
-			// Create nodes collection.
-			this.collection = new Nodes();
-
-			// Re-render on add or remove.
-			this.collection.bind('add', this.render);
-			this.collection.bind('remove', this.render);
+			this.$contextEl = this.model.get('contextEl');
+			this.children = this.model.get('children');
+			// Render new node when added.
+			this.model.bind('add:children', this.renderNode);
 
 			this.render();
 		},
 
 		render: function() {
-			var that = this;
+			this.$el.appendTo(this.$contextEl);
+		},
 
-			this.$el.html('');
+		renderNode: function(model) {
+			var idx = this.children.indexOf(model),
+				node = new app.Views.NodeView({
+					model: model
+				}).render().el;
 
-			this.collection.each(function(node) {
-				that.$el.append(new NodeView({
-					model: node
-				}).render().el);
-			});
-
-			this.$el.appendTo(this.context);
-
-			return this;
+			if (idx === 0) {
+				// If this is the first node to be added
+				// then just append it to the <ul />
+				this.$el.append(node);
+			} else {
+				// Otherwise, find the previous child
+				// and insert it after that.
+				$(node).insertAfter(this.$el.find(':eq(' + (idx - 1) + ')'));
+			}
 		}
 	});
 
-	// App.
-	var AppModel = Backbone.RelationalModel.extend({
-		defaults: {
-			basePx: 16,
-			decimalPlaces: 2
-		},
-		
-		relations: [{
-			type: Backbone.HasMany,
-			key: '',
-			relatedModel: 'nodes',
-			reverseRelation: {
-				key: 'thread',
-				includeInJSON: '_id',
-			},
-		}]
+	app.Views.App = Backbone.View.extend({
+		el: '.em-calc',
+
+		initialize: function() {
+			this.$nodeList = this.$el.find('.list');
+
+			// Init a new node.
+			var rootNode = new app.Models.Node({
+				name: 'root',
+				target: 16,
+				contextEl: this.$nodeList
+			});
+
+			app.settings = new app.Views.SettingsView({
+				model: rootNode
+			});
+			
+			app.nodeNodeSetView = new app.Views.NodeSetView({
+				model: rootNode
+			});
+
+			// Add some child nodes to it.
+			rootNode.get('children').add(
+				new app.Models.Node({
+					name: 'html'
+				})
+			);
+		}
 	});
-	
-	var AppView = Backbone.View.extend({
-			model: new AppModel(),
 
-			el: $('.em-calc'),
-
-			tmpl: _.template($('#settings-template').html()),
-
-			initialize: function() {
-				this.$settings = this.$('.settings-list');
-
-				this.$el.on('click', 'input.ems', function(e) {
-					this.select();
-				});
-
-				this.render();
-			},
-
-			render: function() {
-				this.$settings.html(this.tmpl(this.model.attributes));
-
-				return this;
-			}
-		});
-
-	app.appView = new AppView();
-	app.nodesView = new NodesView();
-}(jQuery, Backbone, window, document));
+	// Go!
+	new app.Views.App();
+}(app, Backbone, window, document));
