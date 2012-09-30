@@ -222,18 +222,17 @@ var app = app || {};
 		},
 
 		addChild: function(event) {
-			var set = new app.Models.Node({
-					name: 'root',
-					contextEl: this.el
-				});
+			var model = this.model;
 
 			event.stopPropagation();
 
+			model.set('contextEl', this.el);
+
 			new app.Views.NodeSetView({
-				model: set
+				model: model
 			});
 
-			set.get('children').add(new app.Models.Node({
+			model.get('children').add(new app.Models.Node({
 				name: 'div'
 			}));
 		},
