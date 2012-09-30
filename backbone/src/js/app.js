@@ -158,8 +158,8 @@ var app = app || {};
 			// Insert the template
 			this.$el.html(this.tmpl(this.model.attributes));
 
-			// Set some jQuery references here. Can't set these up in
-			// initialize because the template won't have been rendered
+			// Set some jQuery references here. Can't set these in the
+			// initialize method because the template won't have been rendered
 			this.$name = this.$el.find('.name');
 			this.$nodeNameField = this.$el.find('input.node-name');
 			this.$targetField = this.$el.find('input.target');
