@@ -25,7 +25,7 @@ var app = app || {};
 		relations: [{
 			type: Backbone.HasMany,
 			key: 'children',
-			relatedModel: 'app.Models.Node', // Its related model is itself... ???
+			relatedModel: 'app.Models.Node', // Its related model is itself...
 			collectionType: 'app.Collections.NodesCollection',
 			reverseRelation: {
 				type: Backbone.HasOne,
@@ -55,17 +55,16 @@ var app = app || {};
 
 		// Calculate em and set it
 		setEm: function() {
-			var res,
+			var result,
 				target = this.get('target'),
 				context = this.get('parent').get('target');
 
-			res = target / context;
+			result = target / context;
 
-			this.set('em', res);
-			// log(this.get('em'));
+			this.set('em', result);
 
 			// Also return "res" just incase
-			return res;
+			return result;
 		},
 
 		setDecimalPlaces: function() {
@@ -208,7 +207,7 @@ var app = app || {};
 		updateEmField: function() {
 			var em = this.model.get('em');
 
-			this.$el.find('.em').val(em + 'em');
+			this.$emField.val(em + 'em');
 		},
 
 		addSibling: function(event) {
