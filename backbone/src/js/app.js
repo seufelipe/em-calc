@@ -278,7 +278,7 @@ var app = app || {};
 			} else {
 				// Otherwise, find the previous child
 				// and insert it after that.
-				$(node).insertAfter(this.$el.find(':eq(' + (idx - 1) + ')'));
+				$(node).insertAfter(this.$el.children(':eq(' + (idx - 1) + ')'));
 			}
 		}
 	});
