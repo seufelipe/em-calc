@@ -241,7 +241,16 @@ var app = app || {};
 
 			this.siblings.remove(this.model);
 
-			this.$el.remove();
+			if (this.siblings.length === 0) {
+				// If the set is now empty remove the whole container.
+				this.$el.closest('ul').remove();
+
+				// And delete the parent instance.
+				delete this.parent;
+			} else {
+				// Otherwise, just remove the relevant element.
+				this.$el.remove();
+			}
 		}
 	});
 
