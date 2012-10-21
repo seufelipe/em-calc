@@ -334,6 +334,7 @@ body {font-size: 0.75em;}
 
 .node-body {
 	display: inline-block;
+	position: relative;
 	margin-bottom: 10px;
 	padding: 10px;
 	border: 1px solid #ccc;
@@ -350,10 +351,12 @@ body {font-size: 0.75em;}
 input.node-name {display: none;}
 
 .delete {
+	position: absolute;
+	top: 50%;
+	right: -20px;
 	font-weight: bold;
 	cursor: pointer;
-	display: inline-block;
-	margin-left: 2px;
+	margin-top: -7px;
 	-webkit-transition: opacity 0.1s ease-in;
 	   -moz-transition: opacity 0.1s ease-in;
 		-ms-transition: opacity 0.1s ease-in;
