@@ -136,6 +136,7 @@ var app = app || {};
 			'dblclick .name': 'toggleNameVisibility',
 			'blur input.node-name': 'updateNodeName',
 			'change input.target': 'updateTarget',
+			'keydown input.target': 'updateTarget',
 			'focus input.em': 'selectEm',
 			'click .add-sibling': 'addSibling',
 			'click .add-child': 'addChild',
@@ -194,10 +195,17 @@ var app = app || {};
 			this.toggleNameVisibility(event);
 		},
 
-		updateTarget: function() {
-			var target = parseInt(this.$targetField.val(), 10);
+		updateTarget: function(event) {
+			if (event.type === 'change' || event.which === 13) {
+				event.preventDefault();
+				event.stopPropagation();
 
-			this.model.set('target', target);
+				var target = parseInt(this.$targetField.val(), 10);
+
+				this.model.set('target', target);
+
+				this.$emField.focus().select();
+			}
 		},
 
 		selectEm: function() {
