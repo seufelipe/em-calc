@@ -330,13 +330,23 @@ td {
 }
 
 /*
-	Structure
+	Base
 	--------------------------------------------------
 */
 body {
   font-size: 0.75em;
 }
 
+input,
+textarea {
+  border: 1px solid #ccc;
+  padding: 4px;
+}
+
+/*
+	Structure
+	--------------------------------------------------
+*/
 .wrap {
   margin: 10px;
   width: 700px;
@@ -394,6 +404,10 @@ body {
 
 input.node-name {
   display: none;
+}
+
+.em {
+  border: 1px dotted #aaa;
 }
 
 .delete {
