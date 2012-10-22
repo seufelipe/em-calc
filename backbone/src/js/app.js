@@ -229,19 +229,30 @@ var app = app || {};
 		},
 
 		addChild: function(event) {
-			var model = this.model;
+			var model = this.model,
+				children = model.get('children'),
+				// New node to add
+				node = new app.Models.Node({
+					name: 'div'
+				});
 
 			event.stopPropagation();
 
 			model.set('contextEl', this.el);
 
-			new app.Views.NodeSetView({
-				model: model
-			});
+			// If there's already a child set
+			if (children && children.length) {
+				// Just add one to it
+				children.add(node);
+			} else {
+				// Otherwise, create a new set
+				new app.Views.NodeSetView({
+					model: model
+				});
 
-			model.get('children').add(new app.Models.Node({
-				name: 'div'
-			}));
+				// And add one
+				children.add(node);
+			}
 		},
 
 		removeChild: function(event) {
