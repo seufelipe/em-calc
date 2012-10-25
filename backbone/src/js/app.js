@@ -36,7 +36,7 @@ var app = app || {};
 		initialize: function() {
 			// Any changes to the target px
 			// should trigger a re-calc of ems
-			this.bind('change:target', function() {
+			this.on('change:target', function() {
 				this.setEm();
 			});
 
@@ -151,7 +151,7 @@ var app = app || {};
 			this.parent = this.model.get('parent');
 			this.siblings = this.parent.get('children');
 
-			this.model.bind('change:em', this.updateEmField);
+			this.model.on('change:em', this.updateEmField);
 		},
 
 		render: function() {
@@ -177,8 +177,7 @@ var app = app || {};
 				this.$name.hide();
 				this.$nodeNameField.show().select();
 			} else {
-				// Otherwise, hide the field and show
-				// the name as text
+				// Otherwise, hide the field and show the name as text
 				this.$nodeNameField.hide();
 				this.$name.show();
 			}
