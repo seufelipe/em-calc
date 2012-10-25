@@ -40,6 +40,10 @@ var app = app || {};
 				this.setEm();
 			});
 
+			this.on('change:decimalPlaces', function() {
+				this.setEm();
+			});
+
 			// Parents notify their children when they have changed
 			/*this.bind('change:target', function() {
 				var children = this.get('children');
@@ -59,7 +63,7 @@ var app = app || {};
 				target = this.get('target'),
 				context = this.get('parent').get('target');
 
-			result = target / context;
+			result = this.setDecimalPlaces(target / context);
 
 			this.set('em', result);
 
@@ -67,12 +71,16 @@ var app = app || {};
 			return result;
 		},
 
-		setDecimalPlaces: function() {
-			var em = this.get('em'),
-				decimalPlaces = this.get('decimalPlaces');
+		// Sets decimal places on em number
+		setDecimalPlaces: function(em) {
+			var decimalPlaces = this.get('decimalPlaces');
 
 			if (em) {
-				this.set('em', em.toFixed(decimalPlaces));
+				// Convert to string first to remove trailing 0s
+				em = em.toFixed(decimalPlaces) + '';
+
+				// And convert back
+				return parseFloat(em, 10);
 			}
 		}
 	});
