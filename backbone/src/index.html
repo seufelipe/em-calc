@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 
-<html lang="en-gb" dir="ltr">
+<html dir="ltr" lang="en-gb">
 	<head>
 		<meta charset="utf-8" />
 		<title>Em Calculator</title>
 
-		<link rel="stylesheet" href="css/screen.css" />
-		<!--
-			Todos:
-			* Settings panel for base font size, etc.
-			* Preview panel for font sizes.
-			* Save
-			* Add "rem" feature.
-		-->
+		<link href="css/styles.css" rel="stylesheet" />
 	</head>
 
 	<body>
@@ -21,34 +14,50 @@
 
 			<div class="settings">
 				<h2>Settings</h2>
-
-				<div class="settings-list"></div>
 			</div>
-
-			<hr />
 
 			<div class="list"></div>
 		</div>
 
-		<script id="settings-template" type="text/template">
-			<ul class="settings-list">
-				<li class="base-px">Base font size: <input type="text" class="text base-px" value="<%= basePx %>" /></li>
-				<li class="decimal-places">Decimal places: <input type="text" class="text decimal-places" value="<%= decimalPlaces %>" /></li>
-			</ul>
+		<script id="node-tmpl" type="text/template">
+			<div class="node-body">
+				<span class="node-name">
+					<span class="name" title="Change node name"><%= name %></span>
+					<input class="text node-name" type="text" value="<%= name %>" />
+				</span> {
+				<input class="text target" type="number" value="<%= target %>" />
+				px = <input class="text em" type="text" value="" readonly /> }
+
+				<button class="add-sibling">Add</button>
+				<button class="add-child">Add Child</button>
+				<span class="delete">&times;</span>
+			</div>
 		</script>
 
-		<script id="node-template" type="text/template">
-			<p class="node-body">
-				<span class="node-name"><span class="name" title="Change node name"><%= name %></span><input type="text" value="<%= name %>" class="text node-name" /></span> { <input type="text" class="text px" value="<%= px %>" /> px = <input type="text" class="text ems" value="<%= em %>em" readonly /> }
-				<button class="add-sibling">Add</button>
-				<button class="add-child">Add Sub</button>
-				<span class="delete">&times;</span>
-			</p>
+		<script id="settings-tmpl" type="text/template">
+			<fieldset>
+				<legend>Settings</legend>
+
+				<div class="field media">
+					<label class="f-label m-unit-1" for="base-px">Default font size:</label>
+					<div class="m-unit-main">
+						<input class="text" id="base-px" type="number" value="<%= target %>" />
+						<span>px</span>
+					</div>
+				</div>
+				<div class="field media">
+					<label class="f-label m-unit-1" for="decimal-places">Decimal places:</label>
+					<div class="m-unit-main">
+						<input class="text" id="decimal-places" type="number" value="<%= decimalPlaces %>" />
+					</div>
+				</div>
+			</fieldset>
 		</script>
 
 		<script src="js/libs/jquery-1.8.2.min.js"></script>
 		<script src="js/libs/underscore-min.js"></script>
 		<script src="js/libs/backbone-min.js"></script>
+		<script src="js/libs/backbone-relational.js"></script>
 		<script src="js/app.js"></script>
 	</body>
 </html>
