@@ -34,15 +34,9 @@ var app = app || {};
 		}],
 
 		initialize: function() {
-			// Any changes to the target px
-			// should trigger a re-calc of ems
-			this.on('change:target', function() {
-				this.setEm();
-			});
-
-			this.on('change:decimalPlaces', function() {
-				this.setEm();
-			});
+			// Any changes to the target px or decimal
+			// places should trigger a re-calc of ems
+			this.on('change:target change:decimalPlaces', this.setEm);
 
 			// Parents notify their children when they have changed
 			/*this.bind('change:target', function() {
