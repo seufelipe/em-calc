@@ -18,6 +18,7 @@ var app = app || {};
 		defaults: {
 			name: 'div', // HTML node name, e.g. html, body, div, p, etc.
 			target: null, // Target pixel value
+			em: null, // Em value
 			decimalPlaces: 3, // Number of decimal places for ems
 			contextEl: '.list'
 		},
@@ -39,7 +40,7 @@ var app = app || {};
 			this.on('change:target change:decimalPlaces', this.setEm);
 
 			// Parents notify their children when they have changed
-			/*this.bind('change:target', function() {
+			this.on('change:em', function() {
 				var children = this.get('children');
 
 				if (children && children.length) {
@@ -48,7 +49,7 @@ var app = app || {};
 						child.setEm();
 					});
 				}
-			});*/
+			});
 		},
 
 		// Calculate em and set it
