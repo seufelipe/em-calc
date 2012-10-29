@@ -20,7 +20,8 @@ var app = app || {};
 			target: null, // Target pixel value
 			em: null, // Em value
 			decimalPlaces: 3, // Number of decimal places for ems
-			contextEl: '.list'
+			contextEl: '.list',
+			isRoot: false
 		},
 
 		relations: [{
@@ -167,6 +168,12 @@ var app = app || {};
 			this.$nodeNameField = this.$el.find('input.node-name');
 			this.$targetField = this.$el.find('input.target');
 			this.$emField = this.$el.find('input.em');
+
+			// Remove the add sibling and delete options
+			// if the node's parent is root.
+			if (this.parent && this.parent.get('isRoot')) {
+				this.$el.find('.add-sibling, .delete').remove();
+			}
 
 			return this;
 		},
@@ -323,7 +330,8 @@ var app = app || {};
 			var rootNode = new app.Models.Node({
 				name: 'root',
 				target: 16,
-				contextEl: this.$nodeList
+				contextEl: this.$nodeList,
+				isRoot: true
 			});
 
 			app.settings = new app.Views.SettingsView({
