@@ -59,12 +59,14 @@ var app = app || {};
 				target = this.get('target'),
 				context = this.get('parent').get('target');
 
-			result = this.setDecimalPlaces(target / context);
+			if (target && context) {
+				result = this.setDecimalPlaces(target / context);
 
-			this.set('em', result);
+				this.set('em', result);
 
-			// Also return "res" just incase
-			return result;
+				// Also return "res" just incase
+				return result;
+			}
 		},
 
 		// Sets decimal places on em number
