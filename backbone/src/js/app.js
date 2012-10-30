@@ -119,13 +119,13 @@ var app = app || {};
 		},
 
 		setBasePx: function() {
-			var val = this.basePxField.val();
+			var val = parseInt(this.basePxField.val(), 10);
 
 			this.model.set('target', val);
 		},
 
 		setDecimalPlaces: function() {
-			var val = this.decimalPlacesField.val();
+			var val = parseInt(this.decimalPlacesField.val(), 10);
 
 			this.model.set('decimalPlaces', val);
 		}
